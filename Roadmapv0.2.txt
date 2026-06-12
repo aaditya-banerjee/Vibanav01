@@ -1,0 +1,36 @@
+Phase 9: Advanced E-Commerce Logic (WBS)
+Phase 9.1: The Identity Engine (feature/customer-profiles)
+
+[ ] Create the feature/customer-profiles Git branch. -- Done
+
+[ ] Build the CustomerProfile database model (linked to Django User). -- Done
+
+[ ] Register the model in the Vibana Admin Dashboard.
+
+[ ] Run makemigrations and migrate to update the Neon database.
+
+[ ] Commit, Push, create Pull Request, and Merge to main.
+
+Phase 9.2: The Inventory Engine (feature/inventory-tracking)
+
+[ ] Create the feature/inventory-tracking Git branch.
+
+[ ] Update the Product model to include a strict stock integer field.
+
+[ ] Wire the Razorpay Webhook to deduct stock automatically on successful payment.
+
+[ ] Update the UI to display "Out of Stock" and disable the "Add to Cart" button when stock hits zero.
+
+[ ] Commit, Push, create Pull Request, and Merge to main.
+
+Phase 9.3: The Promo Engine (feature/promo-codes)
+
+[ ] Create the feature/promo-codes Git branch.
+
+[ ] Build the Coupon model (Code, Value, Start/End Dates, Usage Limits).
+
+[ ] Update the Checkout View to validate the code and recalculate the final Razorpay order amount.
+
+[ ] Add the "Apply Promo Code" UI field to the frontend checkout page.
+
+[ ] Commit, Push, create Pull Request, and Merge to main.

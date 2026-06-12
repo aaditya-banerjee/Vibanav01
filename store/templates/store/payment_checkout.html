@@ -1,0 +1,40 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="card shadow p-5 max-width-600 mx-auto">
+        <h2 class="mb-4">Secure Checkout</h2>
+        <p class="text-muted">Order ID: #{{ order.id }}</p>
+        <h3 class="my-4 text-success">Total Payable: ₹{{ order.total_price }}</h3>
+        
+        <button id="rzp-button1" class="btn btn-primary btn-lg w-100 py-3 font-weight-bold">
+            🔒 Pay Securely with Razorpay
+        </button>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "{{ razorpay_key_id }}", 
+    "amount": "{{ amount_in_paise }}", 
+    "currency": "{{ currency }}",
+    "name": "Threads T-Shirt Co.",
+    "description": "Payment for Order #{{ order.id }}",
+    "order_id": "{{ razorpay_order_id }}",
+    "callback_url": "{{ callback_url }}", // The URL Razorpay redirects to after success
+    "prefill": {
+        "name": "{{ order.user.get_full_name|default:'' }}",
+        "email": "{{ order.user.email|default:'' }}"
+    },
+    "theme": {
+        "color": "#0d6efd" // Standard Bootstrap Blue branding
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+{% endblock %}

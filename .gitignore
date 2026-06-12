@@ -1,0 +1,21 @@
+# Python Bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment files
+venv/
+ENV/
+env/
+
+# Sensitive Local Configurations & Keys
+.env
+.secrets
+
+# Local Development Databases
+db.sqlite3
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db

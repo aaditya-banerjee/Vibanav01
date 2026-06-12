@@ -1,0 +1,12 @@
+Django>=5.1
+djangorestframework
+dj-database-url
+python-dotenv
+reportlab
+gunicorn
+psycopg2-binary
+whitenoise
+razorpay
+cloudinary
+django-cloudinary-storage
+Pillow

@@ -1,0 +1,14 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="text-center py-5 card shadow-sm border-0 max-width-600 mx-auto p-4 bg-white">
+    <div style="font-size: 4rem;">🎉</div>
+    <h2 class="fw-bold text-success my-3">Order Placed Successfully!</h2>
+    <p class="text-muted">Thank you for your order. Your invoice profile sheet has been generated.</p>
+    <div class="alert alert-secondary d-inline-block my-2 px-4">
+        Order Tracking Number: <strong>#{{ order.id }}</strong>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'store:catalog' %}" class="btn btn-dark">Return to Catalog</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="card shadow p-5 max-width-600 mx-auto border-danger">
+        <h1 class="display-4 text-danger">❌ Payment Verification Failed</h1>
+        <p class="lead mt-3">We could not securely verify your payment transaction signature.</p>
+        <hr class="my-4">
+        <p class="text-muted">If money was deducted from your account, it will be automatically refunded by your bank.</p>
+        <a href="/store/cart/" class="btn btn-danger btn-lg mt-4">Return to Cart</a>
+    </div>
+</div>
+{% endblock %}

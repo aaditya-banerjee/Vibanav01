@@ -1,0 +1,53 @@
+tshirt_company/ (Root Project)
+│
+├── 1.0 Infrastructure & Environment Setup --- Completed
+│   ├── 1.1 Python runtime & Virtual Environment isolation
+│   ├── 1.2 Git repository initialization & safety configurations (.gitignore)
+│   ├── 1.3 Configuration management & decoupling (.env architecture)
+│   └── 1.4 Containerization blueprinting (Dockerfile & .dockerignore specs)
+│
+├── 2.0 Database Core & RBAC Schema (Backend) --- Completed
+│   ├── 2.1 Custom Authentication setup & User group definitions (Staff vs Customer)
+│   ├── 2.2 T-Shirt Catalog Models (Product, Category, Size/Color variants)
+│   ├── 2.3 Transaction Engine Models (Order, OrderItem, Lifecycle status tracking)
+│   └── 2.4 Automated Billing Models (Invoice logging, PDF storage hooks)
+│
+├── 3.0 Customer Storefront (The 'store' App) --- Completed
+│   ├── 3.1 Responsive User Interface (Homepage, structural navigation layouts)
+│   ├── 3.2 Dynamic Search & Catalog Filtering (Filtering by size, color, categories)
+│   ├── 3.3 Shopping Cart State Management (Session-based item storage)
+│   └── 3.4 Checkout Flow & Form Processing (Client-side validation & secure order submission)
+│
+└── 4.0 Admin & Staff Dashboard (The 'dashboard' App) --- Completed
+    ├── 4.1 Secure Gateway Enforcement (Group-based login redirection rules)
+    ├── 4.2 Inventory Control Panel (CRUD interface for stock levels, low-stock alerts)
+    ├── 4.3 Automated Billing Engine (Dynamic PDF invoice generation via ReportLab)
+    └── 4.4 Analytics Reporting Engine (Sales trends, top-selling items, revenue trends)
+
+├── 5.0 Containerization & Deployment --- Completed
+│   ├── 5.1 Container Build & Local Verification (Docker build & run tests)
+│   ├── 5.2 Cloud Repository Integration (GitHub version control push)
+│   ├── 5.3 Cloud Provisioning & Architecture (Render web service, Neon PostgreSQL)
+│   └── 5.4 Production Database Seeding & Live Verification (Bypassing ephemeral shells)
+│
+├── 6.0 Payment Security & Webhooks (Razorpay Integration) --- Completed
+│   ├── 6.1 Razorpay SDK Setup & Sandbox Account Provisioning
+│   ├── 6.2 Razorpay Standard Checkout (Injecting the secure payment script overlay)
+│   ├── 6.3 Cryptographic Webhook Listeners (Handling razorpay.payment.captured events)
+│   └── 6.4 Order State Reconciliation (Verifying signatures & marking orders as 'Paid')
+│
+├── 7.0 Persistent Data Storage (Cloud Media Buckets) --- Completed
+│   ├── 7.1 Cloud Storage Bucket Provisioning (AWS S3 or Cloudinary setup)
+│   ├── 7.2 Django Storages Integration (Configuring django-storages backend)
+│   ├── 7.3 Media Pipeline Wiring (Routing admin uploads directly to the cloud bucket)
+│   └── 7.4 Image Serving Optimization (Updating frontend templates to render remote URLs)
+│
+└── 8.0 Compliance & Brand Trust (UX & Legal) --- Completed
+    ├── 8.1 Legal Documentation (Static pages for Privacy Policy & Terms of Service)
+    ├── 8.2 Brand Identity Integration (Custom logos, brand colors, typography overrides)
+    ├── 8.3 UX Polish & Micro-interactions (Product card hover states, hero banners)
+    └── 8.4 Final QA & Live Transaction Testing (End-to-end user journey verification)
+
+SuperUser
+Username : Vibadmin
+Password : Tintin247

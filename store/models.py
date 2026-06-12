@@ -1,6 +1,5 @@
-from django.db import models
-
 # Create your models here.
+from django.db import models
 from django.contrib.auth.models import User
 
 class Category(models.Model):
@@ -64,3 +63,21 @@ class Invoice(models.Model):
 
     def __str__(self):
         return f"Invoice #{self.id} for Order #{self.order.id}"
+
+class CustomerProfile(models.Model):
+    # The OneToOneField strictly links this profile to Django's native authentication
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    
+    # Shipping & Contact Info
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address_line_1 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+    
+    # Payment Gateway Link (For future saved-card features)
+    razorpay_customer_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"

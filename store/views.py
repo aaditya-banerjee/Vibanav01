@@ -1,6 +1,5 @@
 import razorpay
 from django.conf import settings
-from .models import Order 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Product, Category, Order, Invoice
@@ -10,7 +9,7 @@ from django.http import HttpResponseBadRequest
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-    amount_in_paise = int(order.total_price * 100)
+    amount_in_paise = int(order.total_amount * 100) # Ensure this matches your Order model field
     
     data = {
         "amount": amount_in_paise,
@@ -59,8 +58,20 @@ def payment_callback(request):
             order = get_object_or_404(Order, razorpay_order_id=order_id)
             
             # Update order status to paid/processing
-            order.status = 'Processing' # Or 'Paid' depending on your lifecycle statuses
+            order.status = 'Processing'
             order.save()
+            
+            # --- INVENTORY DEDUCTION ---
+            # Read the cart from the session and deduct stock safely
+            cart = request.session.get('cart', {})
+            for product_id, quantity in cart.items():
+                try:
+                    product = Product.objects.get(id=int(product_id))
+                    if product.stock_quantity >= quantity:
+                        product.stock_quantity -= quantity
+                        product.save()
+                except Product.DoesNotExist:
+                    continue
             
             # Clear the customer's session shopping cart since the order is finalized
             if 'cart' in request.session:
@@ -99,7 +110,7 @@ def catalog_view(request):
     context = {
         'products': products,
         'categories': categories,
-        'sizes': Product.SIZE_CHOICES,
+        'sizes': Product.SIZE_CHOICES if hasattr(Product, 'SIZE_CHOICES') else [],
         'current_filters': {
             'search': search_query,
             'category': category_id,
@@ -172,9 +183,7 @@ def checkout_view(request):
         for product_id, quantity in cart.items():
             product = get_object_or_404(Product, id=int(product_id))
             grand_total += product.price * quantity
-            # Deduct stock inventory levels directly upon submission
-            product.stock_quantity -= quantity
-            product.save()
+            # Stock deduction has been moved to payment_callback webhook!
 
         # Create Order record (Assigning to the current logged-in user or an anonymous placeholder)
         order = Order.objects.create(
@@ -186,8 +195,8 @@ def checkout_view(request):
         # Instantiate accompanying Invoice tracking sheet
         Invoice.objects.create(order=order, is_paid=False)
 
-        # Purge cart tracking records from active session
-        request.session['cart'] = {}
+        # We NO LONGER purge the session cart here. The webhook needs it to deduct stock!
+        
         return render(request, 'store/order_success.html', {'order': order})
 
     return render(request, 'store/checkout.html')

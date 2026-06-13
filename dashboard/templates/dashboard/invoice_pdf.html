@@ -49,12 +49,18 @@
 
     <div class="bill-to-section">
         <div class="bill-to-heading">BILL TO</div>
-        <div>
-            <strong>{{ order.customer.get_full_name|default:order.customer.username|default:"Guest Customer" }}</strong><br>
-            Phone: {{ order.customer.customerprofile.phone_number|default:"N/A" }}<br>
-            Email: {{ order.customer.email|default:"N/A" }}
+            <div>
+                {% if order.customer %}
+                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
+                    Phone: {{ order.customer.customerprofile.phone_number|default:"N/A" }}<br>
+                    Email: {{ order.customer.email|default:"N/A" }}
+                {% else %}
+                    <strong>Guest Customer</strong><br>
+                    Phone: N/A<br>
+                    Email: N/A
+                {% endif %}
+            </div>
         </div>
-    </div>
 
     <table class="items-table">
         <thead>

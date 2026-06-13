@@ -20,14 +20,6 @@ class DesignSubmissionAdmin(admin.ModelAdmin):
     list_display = ('title', 'designer', 'status', 'submitted_at')
     list_filter = ('status', 'submitted_at')
     search_fields = ('title', 'designer__username')
-    # Allows you to quickly approve/reject directly from the list view
-    list_editable = ('status',)
-
-@admin.register(DesignSubmission)
-class DesignSubmissionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'designer', 'status', 'submitted_at')
-    list_filter = ('status', 'submitted_at')
-    search_fields = ('title', 'designer__username')
     list_editable = ('status',) 
 
     # NEW: The Automation Engine

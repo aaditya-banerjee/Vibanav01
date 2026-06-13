@@ -6,4 +6,5 @@ app_name = 'creator'
 urlpatterns = [
     path('portal/', views.creator_portal, name='portal'),
     path('login/', views.custom_login, name='login'),
+    path('logout/', views.custom_logout, name='logout'),
 ]

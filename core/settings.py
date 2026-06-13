@@ -19,6 +19,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    # Custom Module
+    'dashboard',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,7 +37,7 @@ INSTALLED_APPS = [
     # Your Custom Modules
     'store',
     'creator',
-    'dashboard',
+    
 ]
 
 MIDDLEWARE = [

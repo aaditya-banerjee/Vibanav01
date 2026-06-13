@@ -1,7 +1,7 @@
 Work Breakdown Structure (WBS) - Phase 10: Creator Workflow
 Objective: Transform Vibana from a standard storefront into a Multi-Role Platform where external designers can pitch artwork, and admins can approve and publish those designs.
 
-Phase 10.1: Database Architecture & Roles (We are here)
+Phase 10.1: Database Architecture & Roles -- Done
 
 Create the DesignSubmission database model to hold pending artwork.
 
@@ -9,7 +9,7 @@ Define the submission statuses (Pending, Approved, Rejected).
 
 Configure Django User Groups to separate standard "Customers" from "Designers."
 
-Phase 10.2: The Creator Portal (Frontend)
+Phase 10.2: The Creator Portal (Frontend) -- Done
 
 Build a secure dashboard exclusively for logged-in Designers.
 

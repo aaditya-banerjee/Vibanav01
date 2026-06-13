@@ -2,8 +2,7 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Product, CustomerProfile  # Add CustomerProfile here
-from .models import Product, Category, Order, Invoice, CustomerProfile, Coupon
+from .models import Product, Category, Order, Invoice, CustomerProfile, Coupon, DesignSubmission
 
 
 @admin.register(CustomerProfile)
@@ -16,3 +15,11 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ('code', 'discount_type', 'discount_value', 'valid_from', 'valid_to', 'active')
     list_filter = ('active', 'valid_from', 'valid_to', 'discount_type')
     search_fields = ('code',)
+
+@admin.register(DesignSubmission)
+class DesignSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'designer', 'status', 'submitted_at')
+    list_filter = ('status', 'submitted_at')
+    search_fields = ('title', 'designer__username')
+    # Allows you to quickly approve/reject directly from the list view
+    list_editable = ('status',)

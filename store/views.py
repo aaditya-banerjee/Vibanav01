@@ -7,8 +7,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest
 from .models import Product, Category, Order, Invoice, Coupon
 from django.contrib.auth.decorators import login_required
-from .models import DesignSubmission
-from .forms import DesignSubmissionForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 

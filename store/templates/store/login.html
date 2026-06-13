@@ -11,6 +11,12 @@
 
             <form method="POST">
                 {% csrf_token %}
+   
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 mb-4 small border-0 shadow-sm text-center">
+                        {{ form.non_field_errors|striptags }}
+                    </div>
+                {% endif %}
 
                 {% for field in form %}
                     <div class="mb-3">

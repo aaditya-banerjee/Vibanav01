@@ -29,14 +29,27 @@ class Product(models.Model):
     size = models.CharField(max_length=10, choices=SIZE_CHOICES)
     color = models.CharField(max_length=50)
     stock_quantity = models.PositiveIntegerField(default=0)
+    stock = models.IntegerField(default=0, help_text="Current available inventory")
     low_stock_threshold = models.PositiveIntegerField(default=10)
-
+    
     @property
     def is_low_stock(self):
         return self.stock_quantity <= self.low_stock_threshold
 
     def __str__(self):
         return f"{self.name} ({self.size} / {self.color})"
+
+    def is_in_stock(self):
+        """Quick check to see if we can sell this item."""
+        return self.stock > 0
+
+    def deduct_stock(self, quantity=1):
+        """Safely deducts stock only if available."""
+        if self.stock >= quantity:
+            self.stock -= quantity
+            self.save()
+            return True
+        return False
 
 class Order(models.Model):
     STATUS_CHOICES = [

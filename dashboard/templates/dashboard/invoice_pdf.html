@@ -2,119 +2,104 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice #{{ order.id }}</title>
     <style>
-        @page {
-            size: a4 portrait;
-            margin: 2cm;
-        }
-        body {
-            font-family: Helvetica, sans-serif;
-            color: #333333;
-            font-size: 14px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1a1d20;
-            letter-spacing: 2px;
-        }
-        .invoice-title {
-            font-size: 20px;
-            color: #ffc107;
-            margin-top: 10px;
-            text-transform: uppercase;
-        }
-        .details-table {
-            width: 100%;
-            margin-bottom: 40px;
-        }
-        .details-table td {
-            vertical-align: top;
-        }
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .summary-table th {
-            background-color: #1a1d20;
-            color: #ffffff;
-            padding: 10px;
-            text-align: left;
-        }
-        .summary-table td {
-            padding: 10px;
-            border-bottom: 1px solid #dddddd;
-        }
-        .total-row {
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #f8f9fa;
-        }
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            font-size: 12px;
-            color: #777777;
-            border-top: 1px solid #dddddd;
-            padding-top: 10px;
-        }
+        @page { size: a4 portrait; margin: 2cm; }
+        body { font-family: Helvetica, sans-serif; color: #1a1d20; font-size: 13px; }
+        .header-table { width: 100%; margin-bottom: 30px; }
+        .brand-name { font-size: 28px; font-weight: bold; letter-spacing: 1px; color: #1a1d20; }
+        .address { color: #555555; font-size: 12px; line-height: 1.4; }
+        .invoice-title { font-size: 22px; font-weight: bold; color: #333333; text-align: right; }
+        
+        .bill-to-section { margin-bottom: 30px; }
+        .bill-to-heading { font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #777777; }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th { background-color: #f8f9fa; border: 1px solid #dddddd; padding: 10px; text-align: left; font-size: 12px; }
+        .items-table td { border: 1px solid #dddddd; padding: 10px; vertical-align: top; }
+        .items-table .right-align { text-align: right; }
+        
+        .totals-table { width: 40%; float: right; border-collapse: collapse; margin-bottom: 30px; }
+        .totals-table td { padding: 8px 10px; border: 1px solid #dddddd; }
+        .totals-table .label { font-weight: bold; background-color: #f8f9fa; }
+        .grand-total { font-size: 16px; font-weight: bold; }
+        
+        .footer { clear: both; margin-top: 40px; font-size: 11px; color: #555555; line-height: 1.6; }
+        .terms-heading { font-weight: bold; font-size: 12px; margin-bottom: 5px; color: #1a1d20; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo">👕 VIBANA</div>
-        <div class="invoice-title">Official Invoice</div>
-    </div>
-
-    <table class="details-table">
+    <table class="header-table">
         <tr>
             <td width="50%">
-                <strong>Billed To:</strong><br>
-                {% if order.customer %}
-                    {{ order.customer.get_full_name|default:order.customer.username }}<br>
-                    {{ order.customer.email }}
-                {% else %}
-                    Guest Customer
-                {% endif %}
+                <div class="brand-name">VIBANA.</div>
+                <div class="address">
+                    Jankipuram<br>
+                    Lucknow, Uttar Pradesh<br>
+                    India
+                </div>
             </td>
-            <td width="50%" align="right">
-                <strong>Order Details:</strong><br>
-                Order No: #{{ order.id }}<br>
-                Date: {{ order.created_at|date:"M d, Y" }}<br>
-                Status: {{ order.status }}
+            <td width="50%" style="text-align: right;">
+                <div class="invoice-title">INVOICE</div>
+                <div>Invoice No: {{ order.id }}</div>
+                <div>Date: {{ order.created_at|date:"d-m-Y" }}</div>
             </td>
         </tr>
     </table>
 
-    <table class="summary-table">
+    <div class="bill-to-section">
+        <div class="bill-to-heading">BILL TO</div>
+        <div>
+            <strong>{{ order.customer.get_full_name|default:order.customer.username|default:"Guest Customer" }}</strong><br>
+            Phone: {{ order.customer.customerprofile.phone_number|default:"N/A" }}<br>
+            Email: {{ order.customer.email|default:"N/A" }}
+        </div>
+    </div>
+
+    <table class="items-table">
         <thead>
             <tr>
-                <th>Description</th>
-                <th style="text-align: right;">Amount</th>
+                <th width="10%">S.NO.</th>
+                <th width="45%">ITEM DESCRIPTION</th>
+                <th width="15%" class="right-align">QUANTITY</th>
+                <th width="15%" class="right-align">RATE (₹)</th>
+                <th width="15%" class="right-align">AMOUNT (₹)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Vibana Apparel Purchase (Order #{{ order.id }})</td>
-                <td style="text-align: right;">₹{{ order.total_amount }}</td>
-            </tr>
-            <tr class="total-row">
-                <td style="text-align: right;"><strong>Grand Total:</strong></td>
-                <td style="text-align: right;"><strong>₹{{ order.total_amount }}</strong></td>
+                <td>01</td>
+                <td>Premium T-Shirt</td>
+                <td class="right-align">{{ assumed_quantity }}</td>
+                <td class="right-align">{{ subtotal }}</td>
+                <td class="right-align">{{ subtotal }}</td>
             </tr>
         </tbody>
     </table>
 
+    <table class="totals-table">
+        <tr>
+            <td class="label">Subtotal:</td>
+            <td class="right-align">{{ subtotal }}</td>
+        </tr>
+        <tr>
+            <td class="label">Tax / GST {% if gst_rate > 0 %}({{ gst_rate }}%){% endif %}:</td>
+            <td class="right-align">{{ gst_amount }}</td>
+        </tr>
+        <tr>
+            <td class="label grand-total">Grand Total:</td>
+            <td class="right-align grand-total">{{ grand_total }}</td>
+        </tr>
+    </table>
+
     <div class="footer">
-        Thank you for shopping with Vibana.<br>
-        If you have any questions concerning this invoice, please contact support@vibana.com.
+        <div><strong>Amount in words:</strong> Rupees (Auto-generation requires a Python text parsing library) Only.</div>
+        <br>
+        <div class="terms-heading">Terms & Conditions:</div>
+        <div>1. Goods once sold will not be taken back.</div>
+        <div>2. This is a computer-generated {% if tax_type == 'gst' %}tax invoice{% else %}non-GST estimate/bill{% endif %} and does not require a physical signature.</div>
+        <br>
+        <div>Thank you for your business!</div>
     </div>
 
 </body>

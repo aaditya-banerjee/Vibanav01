@@ -12,28 +12,51 @@ from xhtml2pdf import pisa
 from django.template.loader import get_template
 
 
-def invoice_pdf(request, order_id):
-    """Generates a downloadable PDF invoice for the admin dashboard."""
+def invoice_pdf(request, order_id, tax_type):
+    """Generates a downloadable PDF invoice with dynamic GST rules."""
     order = get_object_or_404(Order, id=order_id)
     
-    # 1. Grab the HTML template we just made
+    # TEMPORARY MOCK: Until the Order model tracks quantity natively.
+    assumed_quantity = getattr(order, 'total_items', 1) 
+    
+    # Financial calculations
+    subtotal = float(order.total_amount)
+    gst_rate = 0
+    gst_amount = 0.00
+    
+    if tax_type == 'gst':
+        # Apply the 3-shirt rule
+        if assumed_quantity < 3:
+            gst_rate = 5
+        else:
+            gst_rate = 18
+            
+        gst_amount = subtotal * (gst_rate / 100.0)
+        
+    grand_total = subtotal + gst_amount
+    
+    # Package data for the PDF
+    context = {
+        'order': order,
+        'tax_type': tax_type,
+        'assumed_quantity': assumed_quantity,
+        'subtotal': f"{subtotal:,.2f}",
+        'gst_rate': gst_rate,
+        'gst_amount': f"{gst_amount:,.2f}",
+        'grand_total': f"{grand_total:,.2f}",
+    }
+    
     template_path = 'dashboard/invoice_pdf.html'
-    context = {'order': order}
     template = get_template(template_path)
     html = template.render(context)
     
-    # 2. Tell the browser we are sending a PDF, not a webpage
     response = HttpResponse(content_type='application/pdf')
-    # Use 'attachment' to force a download, or 'inline' to view in browser
-    response['Content-Disposition'] = f'attachment; filename="Vibana_Invoice_{order.id}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="Vibana_Invoice_{order.id}_{tax_type}.pdf"'
     
-    # 3. Let xhtml2pdf convert the HTML string into a PDF document
     pisa_status = pisa.CreatePDF(html, dest=response)
-    
-    # 4. Error handling
     if pisa_status.err:
         return HttpResponse('We had some errors generating the PDF.', status=500)
-    
+        
     return response
 
 @staff_member_required

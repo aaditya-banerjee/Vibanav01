@@ -3,10 +3,10 @@ from django.utils.html import format_html
 from django.urls import reverse
 from store.models import Order, Invoice, DesignSubmission, Category, Product
 
-# 1. Global Dashboard Branding
-admin.site.site_header = "Vibana HQ Administration"
+# 1. Global Dashboard Branding (Overrides default Django text)
+admin.site.site_header = "Vibana Administration"
 admin.site.site_title = "Vibana Admin Portal"
-admin.site.index_title = "Welcome to Mission Control"
+admin.site.index_title = "Welcome to Vibana's Admin Dashboard"
 
 # 2. Order Management System
 @admin.register(Order)
@@ -19,8 +19,8 @@ class OrderAdmin(admin.ModelAdmin):
         return obj.customer.username if obj.customer else "Guest Customer"
     customer_display.short_description = 'Customer'
 
-    # Notice the perfectly mapped namespace: 'dashboard:invoice_pdf'
     def download_invoice(self, obj):
+        # Safely points to the new dashboard URL!
         url = reverse('dashboard:invoice_pdf', args=[obj.id])
         return format_html('<a class="button" href="{}" style="background-color: #ffc107; color: #1a1d20; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-weight: bold;">📄 PDF</a>', url)
     download_invoice.short_description = 'Billing'
@@ -41,6 +41,7 @@ class DesignSubmissionAdmin(admin.ModelAdmin):
     list_editable = ('status',)
 
     def save_model(self, request, obj, form, change):
+        # Auto-publish approved designs to the live store
         if obj.status == 'approved' and not obj.final_product:
             collab_category, created = Category.objects.get_or_create(name="Creator Collabs")
             new_tshirt = Product.objects.create(

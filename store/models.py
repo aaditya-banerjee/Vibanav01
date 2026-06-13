@@ -2,6 +2,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -127,3 +129,22 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+class DesignSubmission(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved & Listed'),
+        ('rejected', 'Needs Revisions'),
+    )
+
+    designer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='submissions/images/')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_feedback = models.TextField(blank=True, help_text="Notes for the designer if rejected.")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    final_product = models.OneToOneField('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='original_submission')
+
+    def __str__(self):
+        return f'"{self.title}" by {self.designer.username} - {self.get_status_display()}'

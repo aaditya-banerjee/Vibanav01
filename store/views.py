@@ -6,6 +6,9 @@ from .models import Product, Category, Order, Invoice
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest
 from .models import Product, Category, Order, Invoice, Coupon
+from django.contrib.auth.decorators import login_required
+from .models import DesignSubmission
+from .forms import DesignSubmissionForm
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -248,3 +251,28 @@ def checkout_view(request):
         return render(request, 'store/order_success.html', {'order': order})
 
     return render(request, 'store/checkout.html')
+
+@login_required
+def creator_portal(request):
+    # 1. Handle new artwork submissions
+    if request.method == 'POST':
+        # Notice we include request.FILES because this form handles images!
+        form = DesignSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Pause the save so we can attach the logged-in user as the designer
+            submission = form.save(commit=False)
+            submission.designer = request.user
+            submission.save()
+            messages.success(request, "Artwork submitted successfully! Our team will review it shortly.")
+            return redirect('store:creator_portal')
+    else:
+        form = DesignSubmissionForm()
+
+    # 2. Fetch the designer's history to display on the dashboard
+    past_submissions = DesignSubmission.objects.filter(designer=request.user).order_by('-submitted_at')
+
+    context = {
+        'form': form,
+        'past_submissions': past_submissions
+    }
+    return render(request, 'store/creator_portal.html', context)

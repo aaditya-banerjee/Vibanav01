@@ -24,14 +24,34 @@
                 </li>
             </ul>
 
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center gap-4">
+                
+                <div class="d-flex align-items-center gap-3">
+                    {% if request.user.is_authenticated %}
+                        
+                        {% if request.user.is_superuser or request.user.is_staff %}
+                            <a href="{% url 'admin:index' %}" class="text-warning text-decoration-none fw-bold small">Admin Portal</a>
+                            <a href="{% url 'store:creator_portal' %}" class="text-info text-decoration-none fw-bold small">Creator Portal</a>
+                        {% else %}
+                            <a href="{% url 'store:creator_portal' %}" class="text-light text-decoration-none hover-white small">Creator Workspace</a>
+                        {% endif %}
+                        
+                        <a href="{% url 'admin:logout' %}?next=/" class="text-light text-decoration-none hover-white small">Logout</a>
+                        
+                    {% else %}
+                        <a href="{% url 'admin:login' %}?next=/creator-portal/" class="text-light text-decoration-none hover-white small">Login / Pitch Art</a>
+                    {% endif %}
+                </div>
+
                 <a href="{% url 'store:cart_detail' %}" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
                     <span class="fs-6">🛒</span> Cart
                 </a>
+                
             </div>
         </div>
     </div>
 </nav>
+
     <div class="container">
         {% if messages %}
             {% for message in messages %}
@@ -59,7 +79,7 @@
                 <h6 class="fw-bold text-uppercase mb-3">Shop</h6>
                 <ul class="list-unstyled small">
                     <li class="mb-2"><a href="{% url 'store:catalog' %}" class="text-secondary text-decoration-none hover-white">All Products</a></li>
-                    <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-white">Your Cart</a></li>
+                    <li class="mb-2"><a href="{% url 'store:cart_detail' %}" class="text-secondary text-decoration-none hover-white">Your Cart</a></li>
                 </ul>
             </div>
 

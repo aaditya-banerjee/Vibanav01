@@ -11,10 +11,10 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-test-key-for-local-12345')
 
-#DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
-#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-DEBUG = True
-ALLOWED_HOSTS = ['vibana-tshirt-co.onrender.com', 'localhost', '127.0.0.1']
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+#DEBUG = True
+#ALLOWED_HOSTS = ['vibana-tshirt-co.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 

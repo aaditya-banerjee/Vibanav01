@@ -1,0 +1,26 @@
+Work Breakdown Structure (WBS) - Phase 10: Creator Workflow
+Objective: Transform Vibana from a standard storefront into a Multi-Role Platform where external designers can pitch artwork, and admins can approve and publish those designs.
+
+Phase 10.1: Database Architecture & Roles (We are here)
+
+Create the DesignSubmission database model to hold pending artwork.
+
+Define the submission statuses (Pending, Approved, Rejected).
+
+Configure Django User Groups to separate standard "Customers" from "Designers."
+
+Phase 10.2: The Creator Portal (Frontend)
+
+Build a secure dashboard exclusively for logged-in Designers.
+
+Create the upload form for them to submit new artwork and descriptions.
+
+Build a status-tracking grid so they can see if their work was approved or rejected.
+
+Phase 10.3: The Admin Approval Pipeline
+
+Create a custom queue in the Admin portal for you to review pending submissions.
+
+Build the "Approve" logic: clicking a button automatically duplicates their submission data into a live Product on the storefront.
+
+Wire up notification UI/messages for the designer.

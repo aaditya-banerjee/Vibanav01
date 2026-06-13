@@ -236,13 +236,24 @@ def checkout_view(request):
             grand_total += product.price * quantity
             # Stock deduction has been moved to payment_callback webhook!
 
-        # Create Order record (Assigning to the current logged-in user or an anonymous placeholder)
+        # Create Order record
         order = Order.objects.create(
-            customer=request.user if request.user.is_authenticated else None, # Handles guest vs registered
+            customer=request.user if request.user.is_authenticated else None,
             total_amount=grand_total,
             status='Pending'
         )
         
+        # NEW: Loop through the session cart and save each item permanently
+        for product_id, quantity in cart.items():
+            product = get_object_or_404(Product, id=int(product_id))
+            from .models import OrderItem # local import to be safe
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price_at_purchase=product.price
+            )
+            
         # Instantiate accompanying Invoice tracking sheet
         Invoice.objects.create(order=order, is_paid=False)
 

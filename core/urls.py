@@ -3,10 +3,20 @@
 from django.contrib import admin
 from django.urls import path, include
 
+#urlpatterns = [
+#    path('admin/', admin.site.urls),
+#    path('dashboard/', include('dashboard.urls')),
+#    path('', include('store.urls')),
+#]
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dashboard/', include('dashboard.urls')),
+    
+    # B2C Storefront (Your original app)
     path('', include('store.urls')),
+    
+    # B2B Creator Portal (The new app)
+    path('creator/', include('creator.urls', namespace='creator')),
 ]
 # Rebrand the Django Admin Dashboard
 from django.contrib import admin

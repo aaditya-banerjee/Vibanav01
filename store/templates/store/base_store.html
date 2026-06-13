@@ -36,7 +36,7 @@
                             <a href="{% url 'creator:portal' %}" class="text-light text-decoration-none hover-white small">Creator Workspace</a>
                         {% endif %}
                         
-                        <a href="{% url 'admin:logout' %}?next=/" class="text-light text-decoration-none hover-white small">Logout</a>
+                        <a href="{% url 'creator:logout' %}?next=/" class="text-light text-decoration-none hover-white small">Logout</a>
                         
                     {% else %}
                         <a href="{% url 'creator:login' %}" class="text-light text-decoration-none hover-white small">Login / Pitch Art</a>

@@ -92,6 +92,11 @@
 {% endblock %}
 
 {% block userlinks %}
-    {{ block.super }}
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">Change password</a> /
+    {% endif %}
+    
+    <a href="{% url 'creator:logout' %}">Log out</a>
+    
     <a href="{% url 'store:catalog' %}" class="live-store-btn">View Live Store &rarr;</a>
 {% endblock %}

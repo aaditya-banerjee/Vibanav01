@@ -28,19 +28,13 @@
                 
                 <div class="d-flex align-items-center gap-3">
                     {% if request.user.is_authenticated %}
-                        
                         {% if request.user.is_superuser or request.user.is_staff %}
                             <a href="{% url 'admin:index' %}" class="text-warning text-decoration-none fw-bold small">Admin Portal</a>
-                            <a href="{% url 'creator:portal' %}" class="text-info text-decoration-none fw-bold small">Creator Portal</a>
                         {% else %}
                             <a href="{% url 'creator:portal' %}" class="text-light text-decoration-none hover-white small">Creator Workspace</a>
-                        {% endif %}
-                        
-                        <a href="{% url 'creator:logout' %}?next=/" class="text-light text-decoration-none hover-white small">Logout</a>
-                        
-                    {% else %}
-                        <a href="{% url 'creator:login' %}" class="text-light text-decoration-none hover-white small">Login / Pitch Art</a>
                     {% endif %}
+                        <a href="{% url 'creator:logout' %}" class="text-light text-decoration-none hover-white small">Logout</a>
+                    {% else %}
                 </div>
 
                 <a href="{% url 'store:cart_detail' %}" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2 px-3 py-2 rounded-pill">

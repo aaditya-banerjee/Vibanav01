@@ -5,5 +5,6 @@ from . import views
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('invoice/<int:order_id>/pdf/', views.generate_invoice_pdf, name='invoice_pdf'),
+    # We will map your invoice view here
+    path('invoice/<int:order_id>/', views.admin_invoice, name='admin_invoice'),
 ]

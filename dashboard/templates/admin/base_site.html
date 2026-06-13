@@ -1,16 +1,20 @@
 {% extends "admin/base.html" %}
 
-{% block title %}{{ title }} | Vibana HQ{% endblock %}
+{% block title %}{{ title }} | Vibana Admin Dashboard{% endblock %}
 
 {% block extrastyle %}
 <style>
-    /* Override Django's default with a 'Mission Control' vibe */
+    /* 1. Header Layout & Alignment */
     #header {
-        background: #1a1d20 !important; /* Extra dark for admin */
-        border-bottom: 3px solid #ffc107 !important; /* Admin yellow accent line */
-        color: #ffffff;
+        background: #1a1d20 !important;
+        border-bottom: 3px solid #ffc107 !important;
         padding: 15px 20px;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
     }
+
+    /* 2. Logo Branding */
     #branding h1 {
         color: #ffffff;
         font-weight: 800;
@@ -22,19 +26,58 @@
         color: #ffffff;
         text-decoration: none;
     }
+
+    /* 3. FIX: Sidebar and Module Headers (White text!) */
+    .module h2, .module caption, .inline-group h2 {
+        background: #212529 !important;
+        color: #ffffff !important; /* Brings the text back out of the shadows */
+        border-bottom: 1px solid #495057 !important;
+    }
+
+    /* 4. Breadcrumbs */
     div.breadcrumbs {
         background: #212529 !important;
         color: #f8f9fa;
         border-bottom: 1px solid #343a40;
     }
     div.breadcrumbs a {
-        color: #ffc107 !important; /* Match the gold accent */
-    }
-    .module h2, .module caption, .inline-group h2 {
-        background: #212529 !important;
+        color: #ffc107 !important;
     }
     div.breadcrumbs a:hover {
         color: #ffffff !important;
+    }
+
+    /* 5. FIX: User Tools (Welcome text and logout links) */
+    #user-tools {
+        font-size: 0.85rem;
+        color: #adb5bd !important;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    #user-tools a {
+        color: #ffffff !important;
+        text-decoration: none;
+    }
+    #user-tools a:hover {
+        color: #ffc107 !important;
+    }
+    
+    /* 6. The Custom Live Store Button */
+    .live-store-btn {
+        color: #1a1d20 !important;
+        background-color: #ffc107;
+        padding: 4px 12px;
+        border-radius: 4px;
+        margin-left: 10px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+    .live-store-btn:hover {
+        background-color: #e0a800; /* Slightly darker gold on hover */
+        color: #1a1d20 !important;
     }
 </style>
 {% endblock %}
@@ -42,12 +85,13 @@
 {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
-        🛡️ VIBANA HQ
+        Vibana Admin Dashboard
         <span style="font-size: 0.7rem; font-weight: normal; color: #1a1d20; background-color: #ffc107; margin-left: 10px; vertical-align: middle; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Admin Access</span>
     </a>
 </h1>
 {% endblock %}
 
-{% block nav-global %}
-<a href="{% url 'store:catalog' %}" style="color: #ffc107; font-weight: bold; margin-right: 15px; text-decoration: none;">View Live Store &rarr;</a>
+{% block userlinks %}
+    {{ block.super }}
+    <a href="{% url 'store:catalog' %}" class="live-store-btn">View Live Store &rarr;</a>
 {% endblock %}

@@ -9,10 +9,16 @@ ENV PYTHONUNBUFFERED=1
 # Establish execution workspace inside container system
 WORKDIR /app
 
+# NEW: Install Linux system dependencies for PDF generation (Cairo)
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libcairo2-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy only requirements to leverage Docker build layer caching
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
-
 
 # Copy the rest of the application files
 COPY . /app/
@@ -21,5 +27,4 @@ COPY . /app/
 EXPOSE 8000
 
 # Run system migrations, compress static configurations, and bind application worker engine
-CMD sh -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
 CMD sh -c "python manage.py collectstatic --noinput --clear && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8000"

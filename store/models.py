@@ -94,3 +94,29 @@ class CustomerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+class DesignSubmission(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved & Listed'),
+        ('rejected', 'Needs Revisions'),
+    )
+
+    # Link the submission to the specific designer who uploaded it
+    designer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    
+    # Details about the artwork
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='submissions/images/')
+    
+    # Tracking the approval pipeline
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_feedback = models.TextField(blank=True, help_text="Notes for the designer if rejected.")
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    
+    # If approved, this links to the actual T-shirt on the storefront
+    final_product = models.OneToOneField('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='original_submission')
+
+    def __str__(self):
+        return f'"{self.title}" by {self.designer.username} - {self.get_status_display()}'

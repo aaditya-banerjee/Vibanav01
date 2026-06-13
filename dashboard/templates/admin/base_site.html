@@ -1,34 +1,37 @@
 {% extends "admin/base.html" %}
 
-{% block title %}{{ title }} | Vibana Dashboard{% endblock %}
+{% block title %}{{ title }} | Vibana HQ{% endblock %}
 
 {% block extrastyle %}
 <style>
-    /* Override Django's default dark blue with Vibana's dark theme */
+    /* Override Django's default with a 'Mission Control' vibe */
     #header {
-        background: #212529 !important; /* Matches Bootstrap bg-dark */
+        background: #1a1d20 !important; /* Extra dark for admin */
+        border-bottom: 3px solid #ffc107 !important; /* Admin yellow accent line */
         color: #ffffff;
         padding: 15px 20px;
     }
     #branding h1 {
         color: #ffffff;
-        font-weight: bold;
+        font-weight: 800;
         font-size: 1.5rem;
         margin: 0;
+        letter-spacing: 0.5px;
     }
     #branding h1 a:link, #branding h1 a:visited {
         color: #ffffff;
+        text-decoration: none;
     }
-    /* Style the standard module headers to match */
     div.breadcrumbs {
-        background: #343a40 !important;
+        background: #212529 !important;
         color: #f8f9fa;
+        border-bottom: 1px solid #343a40;
     }
     div.breadcrumbs a {
-        color: #17a2b8 !important; /* Bootstrap text-info */
+        color: #ffc107 !important; /* Match the gold accent */
     }
     .module h2, .module caption, .inline-group h2 {
-        background: #343a40 !important; /* Match Bootstrap bg-dark */
+        background: #212529 !important;
     }
     div.breadcrumbs a:hover {
         color: #ffffff !important;
@@ -37,9 +40,14 @@
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">👕 VIBANA DASHBOARD</a></h1>
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🛡️ VIBANA HQ
+        <span style="font-size: 0.7rem; font-weight: normal; color: #1a1d20; background-color: #ffc107; margin-left: 10px; vertical-align: middle; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Admin Access</span>
+    </a>
+</h1>
 {% endblock %}
 
 {% block nav-global %}
-<a href="{% url 'store:catalog' %}" style="color: #ffc107; font-weight: bold; margin-right: 15px;">View Live Store</a>
+<a href="{% url 'store:catalog' %}" style="color: #ffc107; font-weight: bold; margin-right: 15px; text-decoration: none;">View Live Store &rarr;</a>
 {% endblock %}

@@ -5,17 +5,17 @@ Phase 9.1: The Identity Engine (feature/customer-profiles)
 
 [ ] Build the CustomerProfile database model (linked to Django User). -- Done
 
-[ ] Register the model in the Vibana Admin Dashboard.
+[ ] Register the model in the Vibana Admin Dashboard. -- Done
 
-[ ] Run makemigrations and migrate to update the Neon database.
+[ ] Run makemigrations and migrate to update the Neon database. -- Done
 
-[ ] Commit, Push, create Pull Request, and Merge to main.
+[ ] Commit, Push, create Pull Request, and Merge to main. -- Done
 
 Phase 9.2: The Inventory Engine (feature/inventory-tracking)
 
-[ ] Create the feature/inventory-tracking Git branch.
+[ ] Create the feature/inventory-tracking Git branch. -- Done
 
-[ ] Update the Product model to include a strict stock integer field.
+[ ] Update the Product model to include a strict stock integer field. -- Done
 
 [ ] Wire the Razorpay Webhook to deduct stock automatically on successful payment.
 

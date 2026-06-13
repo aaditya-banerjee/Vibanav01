@@ -20,10 +20,16 @@ class OrderAdmin(admin.ModelAdmin):
     customer_display.short_description = 'Customer'
 
     def download_invoice(self, obj):
-        # Safely points to the new dashboard URL!
-        url = reverse('dashboard:invoice_pdf', args=[obj.id])
-        return format_html('<a class="button" href="{}" style="background-color: #ffc107; color: #1a1d20; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-weight: bold;">📄 PDF</a>', url)
-    download_invoice.short_description = 'Billing'
+        # Generate two separate routes for the buttons
+        url_no_gst = reverse('dashboard:invoice_pdf', args=[obj.id, 'no-gst'])
+        url_gst = reverse('dashboard:invoice_pdf', args=[obj.id, 'gst'])
+        
+        return format_html(
+            '<a class="button" href="{}" style="background-color: #6c757d; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; margin-right: 5px;">📄 No GST</a>'
+            '<a class="button" href="{}" style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-weight: bold;">📄 With GST</a>',
+            url_no_gst, url_gst
+        )
+    download_invoice.short_description = 'Billing Actions'
 
 # 3. Billing & Invoice Tracker
 @admin.register(Invoice)

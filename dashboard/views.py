@@ -13,41 +13,43 @@ from django.template.loader import get_template
 
 
 def invoice_pdf(request, order_id, tax_type):
-    """Generates a downloadable PDF invoice with dynamic GST rules."""
+    """Generates an itemized, GST-compliant PDF invoice."""
     order = get_object_or_404(Order, id=order_id)
+    items = order.items.all()
     
-    # TEMPORARY MOCK: Until the Order model tracks quantity natively.
-    assumed_quantity = getattr(order, 'total_items', 1) 
+    # 1. Calculate Total Quantity
+    total_quantity = sum(item.quantity for item in items)
     
-    # Financial calculations
-    subtotal = float(order.total_amount)
+    # 2. Financials & GST Logic
+    subtotal = float(order.total_amount) # Base price from the portal
     gst_rate = 0
-    gst_amount = 0.00
+    cgst_amount = 0.00
+    sgst_amount = 0.00
     
     if tax_type == 'gst':
-        # Apply the 3-shirt rule
-        if assumed_quantity < 3:
-            gst_rate = 5
-        else:
-            gst_rate = 18
-            
-        gst_amount = subtotal * (gst_rate / 100.0)
+        # Apply the Vibana Tax Brackets
+        gst_rate = 18 if total_quantity >= 3 else 5
         
-    grand_total = subtotal + gst_amount
+        # Split tax evenly between CGST and SGST
+        total_tax_amount = subtotal * (gst_rate / 100.0)
+        cgst_amount = total_tax_amount / 2
+        sgst_amount = total_tax_amount / 2
+        
+    grand_total = subtotal + cgst_amount + sgst_amount
     
-    # Package data for the PDF
     context = {
         'order': order,
+        'items': items,
         'tax_type': tax_type,
-        'assumed_quantity': assumed_quantity,
+        'total_quantity': total_quantity,
         'subtotal': f"{subtotal:,.2f}",
         'gst_rate': gst_rate,
-        'gst_amount': f"{gst_amount:,.2f}",
+        'cgst_amount': f"{cgst_amount:,.2f}",
+        'sgst_amount': f"{sgst_amount:,.2f}",
         'grand_total': f"{grand_total:,.2f}",
     }
     
-    template_path = 'dashboard/invoice_pdf.html'
-    template = get_template(template_path)
+    template = get_template('dashboard/invoice_pdf.html')
     html = template.render(context)
     
     response = HttpResponse(content_type='application/pdf')
@@ -56,7 +58,6 @@ def invoice_pdf(request, order_id, tax_type):
     pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
         return HttpResponse('We had some errors generating the PDF.', status=500)
-        
     return response
 
 @staff_member_required

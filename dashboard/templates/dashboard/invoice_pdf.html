@@ -3,109 +3,127 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @page { size: a4 portrait; margin: 2cm; }
-        body { font-family: Helvetica, sans-serif; color: #1a1d20; font-size: 13px; }
-        .header-table { width: 100%; margin-bottom: 30px; }
-        .brand-name { font-size: 28px; font-weight: bold; letter-spacing: 1px; color: #1a1d20; }
-        .address { color: #555555; font-size: 12px; line-height: 1.4; }
-        .invoice-title { font-size: 22px; font-weight: bold; color: #333333; text-align: right; }
+        @page { size: a4 portrait; margin: 1.5cm; }
+        body { font-family: Helvetica, sans-serif; color: #1a1d20; font-size: 11px; }
+        .brand-header { font-size: 32px; font-weight: bold; color: #1a1d20; margin-bottom: 5px; }
+        .tagline { font-size: 10px; color: #777; margin-bottom: 20px; }
         
-        .bill-to-section { margin-bottom: 30px; }
-        .bill-to-heading { font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #777777; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .matrix-table td { border: 1px solid #ddd; padding: 10px; vertical-align: top; width: 50%; }
+        .section-title { font-weight: bold; font-size: 12px; margin-bottom: 8px; color: #444; background: #f4f4f4; padding: 4px; }
         
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .items-table th { background-color: #f8f9fa; border: 1px solid #dddddd; padding: 10px; text-align: left; font-size: 12px; }
-        .items-table td { border: 1px solid #dddddd; padding: 10px; vertical-align: top; }
-        .items-table .right-align { text-align: right; }
+        .items-table th { background-color: #212529; color: white; padding: 8px; text-align: left; font-size: 10px; border: 1px solid #212529; }
+        .items-table td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+        .right-align { text-align: right; }
         
-        .totals-table { width: 40%; float: right; border-collapse: collapse; margin-bottom: 30px; }
-        .totals-table td { padding: 8px 10px; border: 1px solid #dddddd; }
-        .totals-table .label { font-weight: bold; background-color: #f8f9fa; }
-        .grand-total { font-size: 16px; font-weight: bold; }
+        .summary-table { width: 45%; float: right; border-collapse: collapse; margin-bottom: 30px; }
+        .summary-table td { padding: 6px 8px; border: 1px solid #ddd; }
+        .summary-table .bold { font-weight: bold; background: #f9f9f9; }
+        .grand-total { font-size: 14px; font-weight: bold; background: #e9ecef; }
         
-        .footer { clear: both; margin-top: 40px; font-size: 11px; color: #555555; line-height: 1.6; }
-        .terms-heading { font-weight: bold; font-size: 12px; margin-bottom: 5px; color: #1a1d20; }
+        .footer { clear: both; font-size: 9px; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-    <table class="header-table">
+    <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td width="50%">
-                <div class="brand-name">VIBANA.</div>
-                <div class="address">
-                    Jankipuram<br>
-                    Lucknow, Uttar Pradesh<br>
-                    India
-                </div>
+            <td width="60%">
+                <div class="brand-header">VIBANA</div>
+                <div class="tagline">Official Merchandise & Apparel</div>
+                <div>Jankipuram, Lucknow, Uttar Pradesh, India - 226021</div>
+                <div>GSTIN: 09VIBANAPRO777</div>
             </td>
-            <td width="50%" style="text-align: right;">
-                <div class="invoice-title">INVOICE</div>
-                <div>Invoice No: {{ order.id }}</div>
+            <td width="40%" style="text-align: right;">
+                <h2 style="margin:0; color: #333;">{% if tax_type == 'gst' %}TAX INVOICE{% else %}ESTIMATE / RECEIPT{% endif %}</h2>
+                <div>Invoice No: VIB-2026-{{ order.id|stringformat:"04d" }}</div>
                 <div>Date: {{ order.created_at|date:"d-m-Y" }}</div>
+                <div>Payment Mode: Online / UPI</div>
             </td>
         </tr>
     </table>
 
-    <div class="bill-to-section">
-        <div class="bill-to-heading">BILL TO</div>
-            <div>
+    <table class="matrix-table">
+        <tr>
+            <td>
+                <div class="section-title">Billed To</div>
                 {% if order.customer %}
                     <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
                     Phone: {{ order.customer.customerprofile.phone_number|default:"N/A" }}<br>
-                    Email: {{ order.customer.email|default:"N/A" }}
+                    Email: {{ order.customer.email|default:"N/A" }}<br>
+                    City: {{ order.customer.customerprofile.city|default:"N/A" }}
                 {% else %}
-                    <strong>Guest Customer</strong><br>
-                    Phone: N/A<br>
-                    Email: N/A
+                    <strong>Guest Customer</strong><br>Phone: N/A<br>Email: N/A
                 {% endif %}
-            </div>
-        </div>
+            </td>
+            <td>
+                <div class="section-title">Shipped To</div>
+                {% if order.customer %}
+                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
+                    City: {{ order.customer.customerprofile.city|default:"N/A" }}<br>
+                    State: {{ order.customer.customerprofile.state|default:"N/A" }}
+                {% else %}
+                    <strong>Guest Customer</strong>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
 
     <table class="items-table">
         <thead>
             <tr>
-                <th width="10%">S.NO.</th>
-                <th width="45%">ITEM DESCRIPTION</th>
-                <th width="15%" class="right-align">QUANTITY</th>
-                <th width="15%" class="right-align">RATE (₹)</th>
-                <th width="15%" class="right-align">AMOUNT (₹)</th>
+                <th width="5%">#</th>
+                <th width="45%">Item Description</th>
+                <th width="10%" class="right-align">Qty</th>
+                <th width="20%" class="right-align">Rate (₹)</th>
+                <th width="20%" class="right-align">Taxable Val (₹)</th>
             </tr>
         </thead>
         <tbody>
+            {% for item in items %}
             <tr>
-                <td>01</td>
-                <td>Premium T-Shirt</td>
-                <td class="right-align">{{ assumed_quantity }}</td>
-                <td class="right-align">{{ subtotal }}</td>
-                <td class="right-align">{{ subtotal }}</td>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product.name }}</td>
+                <td class="right-align">{{ item.quantity }}</td>
+                <td class="right-align">{{ item.price_at_purchase }}</td>
+                <td class="right-align">{% widthratio item.price_at_purchase 1 item.quantity %}</td>
             </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center;">Past order (No itemized data available)</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    <table class="totals-table">
+    <table class="summary-table">
         <tr>
-            <td class="label">Subtotal:</td>
+            <td class="bold">Total Taxable Value:</td>
             <td class="right-align">{{ subtotal }}</td>
         </tr>
+        {% if tax_type == 'gst' %}
         <tr>
-            <td class="label">Tax / GST {% if gst_rate > 0 %}({{ gst_rate }}%){% endif %}:</td>
-            <td class="right-align">{{ gst_amount }}</td>
+            <td class="bold">CGST ({{ gst_rate|add:"-0"|floatformat:"1"|default:"0" }}% / 2):</td>
+            <td class="right-align">{{ cgst_amount }}</td>
         </tr>
         <tr>
-            <td class="label grand-total">Grand Total:</td>
-            <td class="right-align grand-total">{{ grand_total }}</td>
+            <td class="bold">SGST ({{ gst_rate|add:"-0"|floatformat:"1"|default:"0" }}% / 2):</td>
+            <td class="right-align">{{ sgst_amount }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td class="grand-total">Grand Total:</td>
+            <td class="right-align grand-total">₹{{ grand_total }}</td>
         </tr>
     </table>
 
     <div class="footer">
-        <div><strong>Amount in words:</strong> Rupees (Auto-generation requires a Python text parsing library) Only.</div>
-        <br>
-        <div class="terms-heading">Terms & Conditions:</div>
-        <div>1. Goods once sold will not be taken back.</div>
-        <div>2. This is a computer-generated {% if tax_type == 'gst' %}tax invoice{% else %}non-GST estimate/bill{% endif %} and does not require a physical signature.</div>
-        <br>
-        <div>Thank you for your business!</div>
+        <strong>Terms & Conditions:</strong><br>
+        1. This is a computer-generated document and does not require a physical signature.<br>
+        2. Goods once sold are subject to the standard Vibana return policy.<br>
+        3. Freedo acts solely as a facilitator. (Just kidding, Vibana handles everything!)<br><br>
+        <em>Thank you for shopping with Vibana Apparel.</em>
     </div>
 
 </body>

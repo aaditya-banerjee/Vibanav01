@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from store.models import Order
 
-def admin_invoice(request, order_id):
+def invoice_pdf(request, order_id):
     """Generates an invoice view for the admin dashboard."""
     order = get_object_or_404(Order, id=order_id)
     

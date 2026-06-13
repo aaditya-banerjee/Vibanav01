@@ -33,6 +33,7 @@ INSTALLED_APPS = [
 
     # Your Custom Modules
     'store',
+    'creator',
     'dashboard',
 ]
 

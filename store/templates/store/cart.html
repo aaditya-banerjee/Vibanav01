@@ -40,13 +40,40 @@
 
     {% if cart_items %}
     <div class="col-md-4">
+        
+        <div class="card p-4 shadow-sm border-0 bg-white mb-4">
+            <h5 class="fw-bold mb-3">Apply Promo Code</h5>
+            <form method="POST" action="{% url 'store:apply_coupon' %}" class="d-flex">
+                {% csrf_token %}
+                <input type="text" name="coupon_code" class="form-control me-2" 
+                       placeholder="Enter Code" 
+                       value="{{ coupon_code|default_if_none:'' }}">
+                <button type="submit" class="btn btn-outline-dark">Apply</button>
+            </form>
+        </div>
+
         <div class="card p-4 shadow-sm border-0 bg-white">
             <h5 class="fw-bold mb-3">Order Summary</h5>
-            <div class="d-flex justify-content-between mb-3 fs-5">
-                <span>Grand Total:</span>
-                <span class="fw-bold text-dark">${{ grand_total }}</span>
+            
+            <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span>₹{{ grand_total|floatformat:2 }}</span>
             </div>
+
+            {% if discount_amount > 0 %}
+            <div class="d-flex justify-content-between mb-2 text-success">
+                <span>Discount ({{ coupon_code }}):</span>
+                <span>-₹{{ discount_amount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+
             <hr>
+            
+            <div class="d-flex justify-content-between mb-3 fs-5">
+                <span>Total Amount:</span>
+                <span class="fw-bold text-dark">₹{{ final_total|floatformat:2 }}</span>
+            </div>
+
             <form method="POST" action="{% url 'store:checkout' %}">
                 {% csrf_token %}
                 <div class="mb-3">

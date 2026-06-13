@@ -17,20 +17,20 @@ Phase 9.2: The Inventory Engine (feature/inventory-tracking)
 
 [ ] Update the Product model to include a strict stock integer field. -- Done
 
-[ ] Wire the Razorpay Webhook to deduct stock automatically on successful payment.
+[ ] Wire the Razorpay Webhook to deduct stock automatically on successful payment. -- Done
 
-[ ] Update the UI to display "Out of Stock" and disable the "Add to Cart" button when stock hits zero.
+[ ] Update the UI to display "Out of Stock" and disable the "Add to Cart" button when stock hits zero. -- Done
 
-[ ] Commit, Push, create Pull Request, and Merge to main.
+[ ] Commit, Push, create Pull Request, and Merge to main. -- Done
 
 Phase 9.3: The Promo Engine (feature/promo-codes)
 
-[ ] Create the feature/promo-codes Git branch.
+[ ] Create the feature/promo-codes Git branch. -- Done
 
-[ ] Build the Coupon model (Code, Value, Start/End Dates, Usage Limits).
+[ ] Build the Coupon model (Code, Value, Start/End Dates, Usage Limits). -- Done
 
-[ ] Update the Checkout View to validate the code and recalculate the final Razorpay order amount.
+[ ] Update the Checkout View to validate the code and recalculate the final Razorpay order amount. -- Done
 
-[ ] Add the "Apply Promo Code" UI field to the frontend checkout page.
+[ ] Add the "Apply Promo Code" UI field to the frontend checkout page. -- Done
 
-[ ] Commit, Push, create Pull Request, and Merge to main.
+[ ] Commit, Push, create Pull Request, and Merge to main. -- Done

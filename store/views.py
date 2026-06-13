@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import Product, Category, Order, Invoice
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest
+from .models import Product, Category, Order, Invoice, Coupon
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -147,11 +148,12 @@ def remove_from_cart_view(request, product_id):
     return redirect('store:cart_detail')
 
 def cart_detail_view(request):
-    """Aggregates items from session storage to render the total breakdown invoice summary."""
+    """Aggregates items and applies any active promo codes."""
     cart = request.session.get('cart', {})
     cart_items = []
     grand_total = 0
 
+    # Calculate base total
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=int(product_id))
         total_price = product.price * quantity
@@ -162,7 +164,53 @@ def cart_detail_view(request):
             'total_price': total_price
         })
 
-    return render(request, 'store/cart.html', {'cart_items': cart_items, 'grand_total': grand_total})
+    # Apply Discount Logic
+    discount_amount = 0
+    coupon_id = request.session.get('coupon_id')
+    coupon_code = None
+
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id)
+            coupon_code = coupon.code
+            if coupon.discount_type == 'percentage':
+                discount_amount = float(grand_total) * (float(coupon.discount_value) / 100)
+            else:
+                discount_amount = float(coupon.discount_value)
+        except Coupon.DoesNotExist:
+            request.session['coupon_id'] = None
+
+    final_total = float(grand_total) - discount_amount
+    if final_total < 0:
+        final_total = 0
+
+    context = {
+        'cart_items': cart_items,
+        'grand_total': grand_total,
+        'discount_amount': discount_amount,
+        'final_total': final_total,
+        'coupon_code': coupon_code
+    }
+    
+    return render(request, 'store/cart.html', context)
+
+def apply_coupon_view(request):
+    """Validates the promo code and saves it to the customer's session."""
+    if request.method == 'POST':
+        code = request.POST.get('coupon_code', '').strip()
+        try:
+            coupon = Coupon.objects.get(code__iexact=code)
+            if coupon.is_valid():
+                request.session['coupon_id'] = coupon.id
+                messages.success(request, f"Promo code '{coupon.code}' applied successfully!")
+            else:
+                request.session['coupon_id'] = None
+                messages.error(request, "This promo code is expired or has reached its usage limit.")
+        except Coupon.DoesNotExist:
+            request.session['coupon_id'] = None
+            messages.error(request, "Invalid promo code.")
+            
+    return redirect('store:cart_detail')
 
 def checkout_view(request):
     """Validates the checkout form, processes the submission, and creates an Order."""

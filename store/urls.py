@@ -17,4 +17,6 @@ urlpatterns = [
     path('terms/', TemplateView.as_view(template_name="store/terms.html"), name='terms'),
     path('privacy/', TemplateView.as_view(template_name="store/privacy.html"), name='privacy'),
     path('refunds/', TemplateView.as_view(template_name="store/refunds.html"), name='refunds'),
+    # Coupons
+    path('apply-coupon/', views.apply_coupon_view, name='apply_coupon'),
 ]

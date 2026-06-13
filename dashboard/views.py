@@ -9,6 +9,8 @@ from store.models import Order
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from xhtml2pdf import pisa
+from django.template.loader import get_template
+
 
 def invoice_pdf(request, order_id):
     """Generates a downloadable PDF invoice for the admin dashboard."""

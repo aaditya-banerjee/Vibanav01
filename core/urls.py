@@ -11,12 +11,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # B2C Storefront (Your original app)
-    path('', include('store.urls')),
-    
-    # B2B Creator Portal (The new app)
-    path('creator/', include('creator.urls', namespace='creator')),
+    path('', include('store.urls')), # B2C Storefront
+    path('creator/', include('creator.urls', namespace='creator')), # B2B Creator Portal
+    path('dashboard/', include('dashboard.urls', namespace='dashboard')), # NEW: Internal Staff Dashboard Map
 ]
 # Rebrand the Django Admin Dashboard
 from django.contrib import admin

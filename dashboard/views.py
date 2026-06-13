@@ -5,8 +5,17 @@ from django.shortcuts import get_object_or_404
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import io
-
 from store.models import Order
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from store.models import Order
+
+def admin_invoice(request, order_id):
+    """Generates an invoice view for the admin dashboard."""
+    order = get_object_or_404(Order, id=order_id)
+    
+    # A simple placeholder response so the button doesn't crash
+    return HttpResponse(f"<h1>Invoice for Order #{order.id}</h1><p>Invoice generation system coming soon!</p>")
 
 @staff_member_required
 def generate_invoice_pdf(request, order_id):

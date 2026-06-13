@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | Vibana Dashboard{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* Override Django's default dark blue with Vibana's dark theme */
+    #header {
+        background: #212529 !important; /* Matches Bootstrap bg-dark */
+        color: #ffffff;
+        padding: 15px 20px;
+    }
+    #branding h1 {
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    #branding h1 a:link, #branding h1 a:visited {
+        color: #ffffff;
+    }
+    /* Style the standard module headers to match */
+    div.breadcrumbs {
+        background: #343a40 !important;
+        color: #f8f9fa;
+    }
+    div.breadcrumbs a {
+        color: #17a2b8 !important; /* Bootstrap text-info */
+    }
+    .module h2, .module caption, .inline-group h2 {
+        background: #343a40 !important; /* Match Bootstrap bg-dark */
+    }
+    div.breadcrumbs a:hover {
+        color: #ffffff !important;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">👕 VIBANA DASHBOARD</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<a href="{% url 'store:catalog' %}" style="color: #ffc107; font-weight: bold; margin-right: 15px;">View Live Store</a>
+{% endblock %}

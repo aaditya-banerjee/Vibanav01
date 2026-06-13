@@ -1,7 +1,7 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -94,3 +94,36 @@ class CustomerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True, help_text="e.g., SUMMER20")
+    
+    DISCOUNT_TYPES = (
+        ('percentage', 'Percentage (%)'),
+        ('flat', 'Flat Amount (₹)'), # Updated to INR for Vibana
+    )
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES, default='percentage')
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2, help_text="Enter 20 for 20%, or 100.00 for ₹100 off")
+    
+    # Time Constraints
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    
+    # Usage Constraints
+    active = models.BooleanField(default=True)
+    max_uses = models.IntegerField(default=100)
+    current_uses = models.IntegerField(default=0)
+    
+    def is_valid(self):
+        """The brain of the promo code."""
+        now = timezone.now()
+        if not self.active:
+            return False
+        if self.current_uses >= self.max_uses:
+            return False
+        if now < self.valid_from or now > self.valid_to:
+            return False
+        return True
+
+    def __str__(self):
+        return self.code

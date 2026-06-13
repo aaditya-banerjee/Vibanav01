@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.utils.html import format_html
 from store.models import Product, Category, Order, Invoice
@@ -29,13 +28,17 @@ class ProductAdmin(admin.ModelAdmin):
     def inventory_alert(self, obj):
         if obj.is_low_stock:
             return format_html('<span style="color: red; font-weight: bold;">⚠️ Low Stock ({} left)</span>', obj.stock_quantity)
-        return format_html('<span style="color: green;">✅ Healthy</span>')
+        # THE FIX: We pass the text as an argument into the {} to satisfy Django's rules
+        return format_html('<span style="color: green;">{}</span>', '✅ Healthy')
     inventory_alert.short_description = 'Stock Status'
+    
     def image_tag(self, obj):
         if obj.image:
+            # We restored your beautiful thumbnail logic!
             return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);" />', obj.image.url)
         return "No Image"
     image_tag.short_description = 'Image'
+    
     class Media:
         css = {
             'all': ('store/admin_layout.css',)

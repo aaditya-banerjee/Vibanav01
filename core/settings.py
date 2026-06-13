@@ -8,12 +8,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load the .env file from the root directory
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+# SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-test-key-for-local-12345')
 
-# DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-DEBUG = False
-ALLOWED_HOSTS = ['vibana-tshirt-co.onrender.com', 'localhost', '127.0.0.1']
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+#DEBUG = True
+#ALLOWED_HOSTS = ['vibana-tshirt-co.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -70,13 +71,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+#DATABASES = {
+#   'default': dj_database_url.config(
+#        default=os.getenv('DATABASE_URL'),
+#        conn_max_age=600
+#    )
+#}
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

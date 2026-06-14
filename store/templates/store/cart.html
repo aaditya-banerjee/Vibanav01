@@ -78,15 +78,23 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Shipping Address</label>
-                    <textarea 
-                        name="address" 
-                        class="form-control" 
-                        rows="3" 
-                        placeholder="Enter full shipping address including city and pincode (min 15 characters)..." 
-                        required 
-                        minlength="15"
-                    >
-                    </textarea>
+                    <div class="row g-2 mb-3">
+                        <div class="col-12">
+                            <input type="text" name="street" class="form-control" required minlength="5" placeholder="Flat/House No, Street Name, Landmark">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="pincode-input" name="pincode" class="form-control" required pattern="\d{6}" maxlength="6" placeholder="6-Digit Pincode">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="city-input" name="city" class="form-control bg-light" required readonly placeholder="Auto-fills City">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="state-input" name="state" class="form-control bg-light" required readonly placeholder="Auto-fills State">
+                        </div>
+                        <div class="col-12">
+                            <small id="pincode-error" class="text-danger" style="display:none; font-weight: bold;">Invalid Indian Pincode. Please check and try again.</small>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-dark w-100 py-2">Submit Secure Order</button>
             </form>
@@ -94,4 +102,46 @@
     </div>
     {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pinInput = document.getElementById('pincode-input');
+    const cityInput = document.getElementById('city-input');
+    const stateInput = document.getElementById('state-input');
+    const errorMsg = document.getElementById('pincode-error');
+
+    pinInput.addEventListener('input', function(e) {
+        // Strip out any non-numbers the user tries to type
+        let pin = e.target.value.replace(/\D/g, ''); 
+        e.target.value = pin;
+
+        // When exactly 6 digits are typed, ping the Postal API!
+        if (pin.length === 6) {
+            fetch(`https://api.postalpincode.in/pincode/${pin}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data[0].Status === "Success") {
+                    // Success! Extract the data and auto-fill the boxes
+                    let postOffice = data[0].PostOffice[0];
+                    cityInput.value = postOffice.District;
+                    stateInput.value = postOffice.State;
+                    errorMsg.style.display = 'none';
+                } else {
+                    // Fake pincode detected
+                    cityInput.value = '';
+                    stateInput.value = '';
+                    errorMsg.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error("Postal API Error:", err);
+            });
+        } else {
+            // Reset fields if they delete numbers
+            cityInput.value = '';
+            stateInput.value = '';
+            errorMsg.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock %}

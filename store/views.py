@@ -11,6 +11,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Order, CustomerProfile
 from .forms import CustomerRegistrationForm
+from django.contrib.auth import authenticate, login, logout
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -321,3 +322,36 @@ def register_view(request):
         form = CustomerRegistrationForm()
 
     return render(request, 'store/register.html', {'form': form})
+
+def login_view(request):
+    """Handles customer login."""
+    # Prevent logged-in users from seeing the login page
+    if request.user.is_authenticated:
+        return redirect('store:profile')
+
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Welcome back, {user.first_name or user.username}!")
+                return redirect('store:profile')
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = AuthenticationForm()
+
+    # Inject Bootstrap classes for styling
+    for field in form.fields.values():
+        field.widget.attrs['class'] = 'form-control'
+
+    return render(request, 'store/login.html', {'form': form})
+
+def logout_view(request):
+    """Handles customer logout."""
+    logout(request)
+    messages.info(request, "You have been successfully logged out.")
+    return redirect('store:login')

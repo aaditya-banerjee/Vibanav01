@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Order, CustomerProfile
-
+from .forms import CustomerRegistrationForm
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -295,3 +295,29 @@ def customer_profile_view(request):
         'orders': user_orders,
     }
     return render(request, 'store/profile.html', context)
+
+def register_view(request):
+    """Handles new customer signups and auto-logins."""
+    # Prevent logged-in users from seeing the signup page
+    if request.user.is_authenticated:
+        return redirect('store:profile')
+
+    if request.method == 'POST':
+        form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():
+            # Save the new user to the database
+            user = form.save()
+            
+            # Immediately instantiate their attached profile
+            CustomerProfile.objects.get_or_create(user=user)
+            
+            # Log them in automatically
+            login(request, user)
+            messages.success(request, f"Welcome to Vibana, {user.first_name}! Your account is ready.")
+            
+            # Send them straight to their shiny new dashboard
+            return redirect('store:profile')
+    else:
+        form = CustomerRegistrationForm()
+
+    return render(request, 'store/register.html', {'form': form})

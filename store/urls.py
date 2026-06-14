@@ -20,4 +20,5 @@ urlpatterns = [
     # Coupons
     path('apply-coupon/', views.apply_coupon_view, name='apply_coupon'),
     path('profile/', views.customer_profile_view, name='profile'),
+    path('register/', views.register_view, name='register'),
 ]

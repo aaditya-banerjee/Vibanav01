@@ -1,35 +1,41 @@
 {% extends 'store/base_store.html' %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0 p-4">
-            <div class="text-center mb-4">
-                <h3 class="fw-bold">Welcome Back</h3>
-                <p class="text-muted small">Log in to manage your workspace.</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Welcome Back</h2>
+                        <p class="text-muted">Log in to view your orders and dashboard.</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'store:login' %}">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-dark py-2">Log In</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0 text-muted">Don't have an account? <a href="{% url 'store:register' %}" class="text-dark fw-bold text-decoration-none">Sign up here</a>.</p>
+                    </div>
+                </div>
             </div>
-
-            <form method="POST">
-                {% csrf_token %}
-   
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger py-2 mb-4 small border-0 shadow-sm text-center">
-                        {{ form.non_field_errors|striptags }}
-                    </div>
-                {% endif %}
-
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">{{ field.label }}</label>
-                        <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" class="form-control" required>
-                        {% if field.errors %}
-                            <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-
-                <button type="submit" class="btn btn-dark w-100 mt-3">Sign In</button>
-            </form>
         </div>
     </div>
 </div>

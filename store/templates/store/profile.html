@@ -1,0 +1,87 @@
+{% extends 'store/base_store.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">My Account</h2>
+            <p class="text-muted">Welcome back, {{ request.user.first_name|default:request.user.username }}!</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-orders-list" data-bs-toggle="list" href="#list-orders" role="tab" aria-controls="list-orders">Order History</a>
+                <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">Account Details</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content" id="nav-tabContent">
+                
+                <div class="tab-pane fade show active" id="list-orders" role="tabpanel" aria-labelledby="list-orders-list">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Recent Orders</h5>
+                            
+                            {% if orders %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Order #</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in orders %}
+                                            <tr>
+                                                <td><strong>{{ order.id }}</strong></td>
+                                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <span class="badge {% if order.status == 'Pending' %}bg-warning text-dark{% elif order.status == 'Processing' %}bg-info text-dark{% else %}bg-success{% endif %}">
+                                                        {{ order.status }}
+                                                    </span>
+                                                </td>
+                                                <td>₹{{ order.total_amount }}</td>
+                                                <td>
+                                                    <a href="{% url 'dashboard:invoice_pdf' order.id 'gst' %}" class="btn btn-sm btn-outline-dark" target="_blank">
+                                                        📄 Download Invoice
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted">You haven't placed any orders yet.</p>
+                                    <a href="{% url 'store:catalog' %}" class="btn btn-dark">Start Shopping</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Saved Information</h5>
+                            <p><strong>Email:</strong> {{ request.user.email }}</p>
+                            <p><strong>Phone:</strong> {{ profile.phone_number|default:"Not provided" }}</p>
+                            <hr>
+                            <p class="text-muted small"><em>Address management coming soon!</em></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

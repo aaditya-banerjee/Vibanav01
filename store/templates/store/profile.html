@@ -49,9 +49,13 @@
                                                 </td>
                                                 <td>₹{{ order.total_amount }}</td>
                                                 <td>
+                                                {% if order.status == 'Delivered' %}
                                                     <a href="{% url 'dashboard:invoice_pdf' order.id 'gst' %}" class="btn btn-sm btn-outline-dark" target="_blank">
                                                         📄 Download Invoice
                                                     </a>
+                                                {% else %}
+                                                    <span class="text-muted small">Available upon delivery</span>
+                                                {% endif %}
                                                 </td>
                                             </tr>
                                             {% endfor %}

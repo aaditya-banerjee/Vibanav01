@@ -354,4 +354,4 @@ def logout_view(request):
     """Handles customer logout."""
     logout(request)
     messages.info(request, "You have been successfully logged out.")
-    return redirect('store:login')
+    return redirect('store:catalog')

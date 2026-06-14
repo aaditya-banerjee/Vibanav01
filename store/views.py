@@ -224,7 +224,21 @@ def checkout_view(request):
 
     if request.method == 'POST':
         # Quick validation check for delivery information
-        address = request.POST.get('address', '').strip()
+        
+        street = request.POST.get('street', '').strip()
+        pincode = request.POST.get('pincode', '').strip()
+        city = request.POST.get('city', '').strip()
+        state = request.POST.get('state', '').strip()
+
+        # If any field is missing (or bypassed), reject the submission
+        if not all([street, pincode, city, state]):
+            messages.error(request, "Please provide a complete and valid shipping address.")
+            return redirect('store:checkout')
+
+        # Combine them into a single formatted string for your Order model
+        full_address = f"{street}, {city}, {state} - {pincode}"
+        
+        # (Proceed to create your Order record below this using the full_address if you store it!)
         if not address:
             messages.error(request, "Please enter a valid shipping destination address.")
             return redirect('store:checkout')

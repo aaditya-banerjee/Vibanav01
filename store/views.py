@@ -2,21 +2,20 @@ import razorpay
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Product, Category, Order, Invoice
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest
-from .models import Product, Category, Order, Invoice, Coupon
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from .models import Order, CustomerProfile
-from .forms import CustomerRegistrationForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+
+from .models import Product, Category, Order, Invoice, Coupon, CustomerProfile, OrderItem
+from .forms import CustomerRegistrationForm
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-    amount_in_paise = int(order.total_amount * 100) # Ensure this matches your Order model field
+    amount_in_paise = int(order.total_amount * 100)
     
     data = {
         "amount": amount_in_paise,
@@ -46,7 +45,6 @@ def payment_callback(request):
     if request.method == "POST":
         client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         
-        # Extract the payment credentials sent by Razorpay
         payment_id = request.POST.get('razorpay_payment_id', '')
         order_id = request.POST.get('razorpay_order_id', '')
         signature = request.POST.get('razorpay_signature', '')
@@ -58,18 +56,11 @@ def payment_callback(request):
         }
         
         try:
-            # Cryptographically verify the signature matches our secret key
             client.utility.verify_payment_signature(params_dict)
-            
-            # Signature is valid! Fetch the matching order from our database
             order = get_object_or_404(Order, razorpay_order_id=order_id)
-            
-            # Update order status to paid/processing
             order.status = 'Processing'
             order.save()
             
-            # --- INVENTORY DEDUCTION ---
-            # Read the cart from the session and deduct stock safely
             cart = request.session.get('cart', {})
             for product_id, quantity in cart.items():
                 try:
@@ -80,29 +71,24 @@ def payment_callback(request):
                 except Product.DoesNotExist:
                     continue
             
-            # Clear the customer's session shopping cart since the order is finalized
             if 'cart' in request.session:
                 del request.session['cart']
                 
             return render(request, 'store/payment_success.html', {'order': order, 'payment_id': payment_id})
             
         except razorpay.errors.SignatureVerificationError:
-            # The signature did not match! This means the request was modified or fake.
             return render(request, 'store/payment_failed.html')
             
     return HttpResponseBadRequest("Invalid request method.")
 
 def catalog_view(request):
-    """Displays the T-shirt catalog with search capability and sidebar filters."""
     products = Product.objects.all()
     categories = Category.objects.all()
 
-    # Apply Search Query Filter
     search_query = request.GET.get('search', '')
     if search_query:
         products = products.filter(name__icontains=search_query)
 
-    # Apply Sidebar Selection Filters
     category_id = request.GET.get('category')
     size = request.GET.get('size')
     color = request.GET.get('color')
@@ -128,10 +114,7 @@ def catalog_view(request):
     return render(request, 'store/catalog.html', context)
 
 def add_to_cart_view(request, product_id):
-    """Increments an item within the customer's session-serialized cart."""
     product = get_object_or_404(Product, id=product_id)
-    
-    # Check inventory limits before adding
     cart = request.session.get('cart', {})
     current_quantity = cart.get(str(product_id), 0)
     
@@ -145,7 +128,6 @@ def add_to_cart_view(request, product_id):
     return redirect('store:catalog')
 
 def remove_from_cart_view(request, product_id):
-    """Removes an entire product item line from the session cart array."""
     cart = request.session.get('cart', {})
     if str(product_id) in cart:
         del cart[str(product_id)]
@@ -154,12 +136,10 @@ def remove_from_cart_view(request, product_id):
     return redirect('store:cart_detail')
 
 def cart_detail_view(request):
-    """Aggregates items and applies any active promo codes."""
     cart = request.session.get('cart', {})
     cart_items = []
     grand_total = 0
 
-    # Calculate base total
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=int(product_id))
         total_price = product.price * quantity
@@ -170,7 +150,6 @@ def cart_detail_view(request):
             'total_price': total_price
         })
 
-    # Apply Discount Logic
     discount_amount = 0
     coupon_id = request.session.get('coupon_id')
     coupon_code = None
@@ -201,7 +180,6 @@ def cart_detail_view(request):
     return render(request, 'store/cart.html', context)
 
 def apply_coupon_view(request):
-    """Validates the promo code and saves it to the customer's session."""
     if request.method == 'POST':
         code = request.POST.get('coupon_code', '').strip()
         try:
@@ -219,53 +197,55 @@ def apply_coupon_view(request):
     return redirect('store:cart_detail')
 
 def checkout_view(request):
-    """Validates the checkout form, processes the submission, and creates an Order."""
     cart = request.session.get('cart', {})
     if not cart:
         messages.error(request, "Your cart is completely empty.")
         return redirect('store:catalog')
 
     if request.method == 'POST':
-        # Quick validation check for delivery information
-        
         street = request.POST.get('street', '').strip()
         pincode = request.POST.get('pincode', '').strip()
         city = request.POST.get('city', '').strip()
         state = request.POST.get('state', '').strip()
 
-        # If any field is missing (or bypassed), reject the submission
         if not all([street, pincode, city, state]):
             messages.error(request, "Please provide a complete and valid shipping address.")
             return redirect('store:checkout')
 
-        # Combine them into a single formatted string for your Order model
         address = f"{street}, {city}, {state} - {pincode}"
-        
-        # (Proceed to create your Order record below this using the full_address if you store it!)
+
+        # Handle Guest Contact Data
+        guest_email = None
+        if not request.user.is_authenticated:
+            guest_email = request.POST.get('guest_email', '').strip()
+            receiver_name = request.POST.get('receiver_name', '').strip()
+            phone_number = request.POST.get('phone_number', '').strip()
+            
+            if not all([guest_email, receiver_name, phone_number]):
+                messages.error(request, "Guest checkout requires name, email, phone, and consent.")
+                return redirect('store:cart')
+                
+            address = f"{receiver_name} | Ph: {phone_number} | {address}"
+
         if not address:
             messages.error(request, "Please enter a valid shipping destination address.")
             return redirect('store:checkout')
 
-        # Compute total amount
         grand_total = 0
         for product_id, quantity in cart.items():
             product = get_object_or_404(Product, id=int(product_id))
             grand_total += product.price * quantity
-            # Stock deduction has been moved to payment_callback webhook!
 
-        # Create Order record
         order = Order.objects.create(
             customer=request.user if request.user.is_authenticated else None,
             total_amount=grand_total,
             status='Pending',
             shipping_address=address,
-            guest_email = request.POST.get('email', '').strip()
+            guest_email=guest_email
         )
         
-        # NEW: Loop through the session cart and save each item permanently
         for product_id, quantity in cart.items():
             product = get_object_or_404(Product, id=int(product_id))
-            from .models import OrderItem # local import to be safe
             OrderItem.objects.create(
                 order=order,
                 product=product,
@@ -273,25 +253,15 @@ def checkout_view(request):
                 price_at_purchase=product.price
             )
             
-        # Instantiate accompanying Invoice tracking sheet
         Invoice.objects.create(order=order, is_paid=False)
 
-        # We NO LONGER purge the session cart here. The webhook needs it to deduct stock!
-        
-        # THE FIX: Replace the old render line with this redirect!
         return redirect('store:order_success', order_id=order.id)
 
-    # This stays exactly where it is, catching the GET request
     return render(request, 'store/checkout.html')
 
-@login_required(login_url='/login/') # Redirects to login if a guest tries to access it
+@login_required(login_url='/login/')
 def customer_profile_view(request):
-    """Displays the customer dashboard with order history and saved addresses."""
-    
-    # Safely get or create the profile just in case it doesn't exist yet
     profile, created = CustomerProfile.objects.get_or_create(user=request.user)
-    
-    # Fetch all orders belonging to this user, newest first
     user_orders = Order.objects.filter(customer=request.user).order_by('-created_at')
     
     context = {
@@ -301,25 +271,16 @@ def customer_profile_view(request):
     return render(request, 'store/profile.html', context)
 
 def register_view(request):
-    """Handles new customer signups and auto-logins."""
-    # Prevent logged-in users from seeing the signup page
     if request.user.is_authenticated:
         return redirect('store:profile')
 
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
-            # Save the new user to the database
             user = form.save()
-            
-            # Immediately instantiate their attached profile
             CustomerProfile.objects.get_or_create(user=user)
-            
-            # Log them in automatically
             login(request, user)
             messages.success(request, f"Welcome to Vibana, {user.first_name}! Your account is ready.")
-            
-            # Send them straight to their shiny new dashboard
             return redirect('store:profile')
     else:
         form = CustomerRegistrationForm()
@@ -327,9 +288,6 @@ def register_view(request):
     return render(request, 'store/register.html', {'form': form})
 
 def login_view(request):
-    """Handles authentication and role-based redirects."""
-    
-    # 1. If they are already logged in, route them instantly based on role
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('admin:index')
@@ -347,44 +305,37 @@ def login_view(request):
             
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Welcome back, {user.first_name or user.username}!")
                 
-                # 2. Route them based on role immediately after a successful login
+                # Check role for correct redirect
                 if user.is_superuser:
                     return redirect('admin:index')
                 elif user.is_staff:
                     return redirect('creator:portal')
                 else:
                     return redirect('store:profile')
-        else:
-            messages.error(request, "Invalid username or password.")
+        # We REMOVED the global messages.error here so it only shows inside the login box!
     else:
         form = AuthenticationForm()
 
-    # Inject Bootstrap classes for styling
     for field in form.fields.values():
         field.widget.attrs['class'] = 'form-control'
 
     return render(request, 'store/login.html', {'form': form})
 
 def logout_view(request):
-    """Handles customer logout."""
     logout(request)
     messages.info(request, "You have been successfully logged out.")
     return redirect('store:catalog')
 
 def order_success_view(request, order_id):
-    """Displays the order confirmation and the guest conversion prompt."""
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'store/order_success.html', {'order': order})
 
 def convert_guest_view(request, order_id):
-    """Upgrades a guest into a registered user and links their order."""
     if request.method == 'POST':
         order = get_object_or_404(Order, id=order_id)
         password = request.POST.get('password')
         
-        # Safety checks
         if order.customer is not None or not order.guest_email:
             return redirect('store:catalog')
             
@@ -392,18 +343,15 @@ def convert_guest_view(request, order_id):
             messages.error(request, "An account with this email already exists. Please log in.")
             return redirect('store:login')
 
-        # 1. Create the new User account
         user = User.objects.create_user(
             username=order.guest_email, 
             email=order.guest_email, 
             password=password
         )
         
-        # 2. Retroactively link the order
         order.customer = user
         order.save()
         
-        # 3. Create their profile and log them in
         CustomerProfile.objects.get_or_create(user=user)
         login(request, user)
         

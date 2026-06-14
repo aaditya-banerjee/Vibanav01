@@ -66,7 +66,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
+    shipping_address = models.TextField(null=True, blank=True)
+    
     def __str__(self):
         customer_name = self.customer.username if self.customer else "Guest Customer"
         return f"Order #{self.id} - {customer_name}"

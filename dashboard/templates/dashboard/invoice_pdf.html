@@ -50,22 +50,22 @@
                 <div class="section-title">Billed To</div>
                 {% if order.customer %}
                     <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                    Phone: {{ order.customer.customerprofile.phone_number|default:"N/A" }}<br>
                     Email: {{ order.customer.email|default:"N/A" }}<br>
-                    City: {{ order.customer.customerprofile.city|default:"N/A" }}
                 {% else %}
-                    <strong>Guest Customer</strong><br>Phone: N/A<br>Email: N/A
+                    <strong>Guest Customer</strong><br>
                 {% endif %}
+                <br><strong>Billing Address:</strong><br>
+                {{ order.shipping_address|default:"Address not provided" }}
             </td>
             <td>
                 <div class="section-title">Shipped To</div>
                 {% if order.customer %}
                     <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                    City: {{ order.customer.customerprofile.city|default:"N/A" }}<br>
-                    State: {{ order.customer.customerprofile.state|default:"N/A" }}
                 {% else %}
-                    <strong>Guest Customer</strong>
+                    <strong>Guest Customer</strong><br>
                 {% endif %}
+                <br><strong>Shipping Address:</strong><br>
+                {{ order.shipping_address|default:"Address not provided" }}
             </td>
         </tr>
     </table>

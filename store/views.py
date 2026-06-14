@@ -258,7 +258,8 @@ def checkout_view(request):
             customer=request.user if request.user.is_authenticated else None,
             total_amount=grand_total,
             status='Pending',
-            shipping_address=address
+            shipping_address=address,
+            guest_email = request.POST.get('email', '').strip()
         )
         
         # NEW: Loop through the session cart and save each item permanently
@@ -277,8 +278,10 @@ def checkout_view(request):
 
         # We NO LONGER purge the session cart here. The webhook needs it to deduct stock!
         
-        return render(request, 'store/order_success.html', {'order': order})
+        # THE FIX: Replace the old render line with this redirect!
+        return redirect('store:order_success', order_id=order.id)
 
+    # This stays exactly where it is, catching the GET request
     return render(request, 'store/checkout.html')
 
 @login_required(login_url='/login/') # Redirects to login if a guest tries to access it
@@ -324,10 +327,16 @@ def register_view(request):
     return render(request, 'store/register.html', {'form': form})
 
 def login_view(request):
-    """Handles customer login."""
-    # Prevent logged-in users from seeing the login page
+    """Handles authentication and role-based redirects."""
+    
+    # 1. If they are already logged in, route them instantly based on role
     if request.user.is_authenticated:
-        return redirect('store:profile')
+        if request.user.is_superuser:
+            return redirect('admin:index')
+        elif request.user.is_staff:
+            return redirect('creator:portal')
+        else:
+            return redirect('store:profile')
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -335,10 +344,18 @@ def login_view(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
+            
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Welcome back, {user.first_name or user.username}!")
-                return redirect('store:profile')
+                
+                # 2. Route them based on role immediately after a successful login
+                if user.is_superuser:
+                    return redirect('admin:index')
+                elif user.is_staff:
+                    return redirect('creator:portal')
+                else:
+                    return redirect('store:profile')
         else:
             messages.error(request, "Invalid username or password.")
     else:
@@ -354,4 +371,43 @@ def logout_view(request):
     """Handles customer logout."""
     logout(request)
     messages.info(request, "You have been successfully logged out.")
+    return redirect('store:catalog')
+
+def order_success_view(request, order_id):
+    """Displays the order confirmation and the guest conversion prompt."""
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'store/order_success.html', {'order': order})
+
+def convert_guest_view(request, order_id):
+    """Upgrades a guest into a registered user and links their order."""
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        password = request.POST.get('password')
+        
+        # Safety checks
+        if order.customer is not None or not order.guest_email:
+            return redirect('store:catalog')
+            
+        if User.objects.filter(email=order.guest_email).exists():
+            messages.error(request, "An account with this email already exists. Please log in.")
+            return redirect('store:login')
+
+        # 1. Create the new User account
+        user = User.objects.create_user(
+            username=order.guest_email, 
+            email=order.guest_email, 
+            password=password
+        )
+        
+        # 2. Retroactively link the order
+        order.customer = user
+        order.save()
+        
+        # 3. Create their profile and log them in
+        CustomerProfile.objects.get_or_create(user=user)
+        login(request, user)
+        
+        messages.success(request, "Account created! Your order has been linked to your new dashboard.")
+        return redirect('store:profile')
+        
     return redirect('store:catalog')

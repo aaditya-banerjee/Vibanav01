@@ -236,7 +236,7 @@ def checkout_view(request):
             return redirect('store:checkout')
 
         # Combine them into a single formatted string for your Order model
-        full_address = f"{street}, {city}, {state} - {pincode}"
+        address = f"{street}, {city}, {state} - {pincode}"
         
         # (Proceed to create your Order record below this using the full_address if you store it!)
         if not address:

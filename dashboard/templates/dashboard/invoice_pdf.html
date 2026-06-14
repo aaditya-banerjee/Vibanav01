@@ -47,22 +47,71 @@
     <table class="matrix-table">
         <tr>
             <td>
-                <div class="section-title">Billed To</div>
+                <div class="section-title">Bill To</div>
+                
                 {% if order.customer %}
-                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                    Contact: {{ order.customer.customerprofile.phone_number|default:"Available in Profile" }}
+                    <strong>Biller Name:</strong> 
+                    {% if order.customer.get_full_name %}
+                        {{ order.customer.get_full_name }}
+                    {% elif order.receiver_name and "@" not in order.receiver_name and order.receiver_name != "None" %}
+                        {{ order.receiver_name }}
+                    {% else %}
+                        Customer
+                    {% endif %}
+                    <br>
+                    
+                    <strong>Billing Address:</strong><br>
+                    {{ order.shipping_address|default:"N/A" }}<br>
+                    
+                    <strong>Contact:</strong> 
+                    {% if order.customer.customerprofile.phone_number %}
+                        {{ order.customer.customerprofile.phone_number }}
+                    {% elif order.receiver_phone and order.receiver_phone != "None" %}
+                        {{ order.receiver_phone }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                
                 {% else %}
-                    <strong>{{ order.receiver_name }}</strong><br>
-                    Contact: {{ order.receiver_phone }}
+                    <strong>Biller Name:</strong> 
+                    {% if order.receiver_name and "@" not in order.receiver_name and order.receiver_name != "None" %}
+                        {{ order.receiver_name }}
+                    {% else %}
+                        Guest Customer
+                    {% endif %}
+                    <br>
+                    
+                    <strong>Contact:</strong> 
+                    {% if order.receiver_phone and order.receiver_phone != "None" %}
+                        {{ order.receiver_phone }}
+                    {% else %}
+                        N/A
+                    {% endif %}
                 {% endif %}
             </td>
             
             <td>
                 <div class="section-title">Shipped To</div>
-                <strong>{{ order.receiver_name }}</strong><br><br>
+                
+                <strong>Receiver's Name:</strong> 
+                {% if order.receiver_name and "@" not in order.receiver_name and order.receiver_name != "None" %}
+                    {{ order.receiver_name }}
+                {% elif order.customer and order.customer.get_full_name %}
+                    {{ order.customer.get_full_name }}
+                {% else %}
+                    N/A
+                {% endif %}
+                <br>
+                
                 <strong>Shipping Address:</strong><br>
-                {{ order.shipping_address }}<br><br>
-                <strong>Contact:</strong> {{ order.receiver_phone }}
+                {{ order.shipping_address|default:"N/A" }}<br>
+                
+                <strong>Contact:</strong> 
+                {% if order.receiver_phone and order.receiver_phone != "None" %}
+                    {{ order.receiver_phone }}
+                {% else %}
+                    N/A
+                {% endif %}
             </td>
         </tr>
     </table>

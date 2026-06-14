@@ -29,12 +29,15 @@ def invoice_pdf(request, order_id, tax_type):
     if tax_type == 'gst':
         # Apply the Vibana Tax Brackets
         gst_rate = 18 if total_quantity >= 3 else 5
-        
+        split_rate = gst_rate / 2.0
+
         # Split tax evenly between CGST and SGST
         total_tax_amount = subtotal * (gst_rate / 100.0)
         cgst_amount = total_tax_amount / 2
         sgst_amount = total_tax_amount / 2
-        
+    else:
+        split_rate = 0.0 # Safety fallback for no-gst
+
     grand_total = subtotal + cgst_amount + sgst_amount
     
     context = {
@@ -47,6 +50,7 @@ def invoice_pdf(request, order_id, tax_type):
         'cgst_amount': f"{cgst_amount:,.2f}",
         'sgst_amount': f"{sgst_amount:,.2f}",
         'grand_total': f"{grand_total:,.2f}",
+        'split_rate': split_rate,
     }
     
     template = get_template('dashboard/invoice_pdf.html')

@@ -104,11 +104,11 @@
         </tr>
         {% if tax_type == 'gst' %}
         <tr>
-            <td class="bold">CGST ({{ gst_rate|add:"-0"|floatformat:"1"|default:"0" }}% / 2):</td>
+            <td class="bold">CGST ({{ split_rate }}%):</td>
             <td class="right-align">{{ cgst_amount }}</td>
         </tr>
         <tr>
-            <td class="bold">SGST ({{ gst_rate|add:"-0"|floatformat:"1"|default:"0" }}% / 2):</td>
+            <td class="bold">SGST ({{ split_rate }}%):</td>
             <td class="right-align">{{ sgst_amount }}</td>
         </tr>
         {% endif %}

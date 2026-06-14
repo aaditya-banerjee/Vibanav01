@@ -23,7 +23,7 @@
                                     <small class="text-muted">Size: {{ item.product.size }} | Color: {{ item.product.color }}</small>
                                 </td>
                                 <td>{{ item.quantity }}</td>
-                                <td class="fw-bold">${{ item.total_price }}</td>
+                                <td class="fw-bold">₹{{ item.total_price }}</td>
                                 <td>
                                     <a href="{% url 'store:remove_from_cart' item.product.id %}" class="text-danger small text-decoration-none">Remove</a>
                                 </td>
@@ -78,7 +78,15 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Shipping Address</label>
-                    <textarea name="address" rows="3" class="form-control" placeholder="123 Street, City, Country" required></textarea>
+                    <textarea 
+                        name="address" 
+                        class="form-control" 
+                        rows="3" 
+                        required 
+                        minlength="15" 
+                        placeholder="Enter full shipping address including city and pincode (min 15 characters)..."
+                    >
+                    </textarea>
                 </div>
                 <button type="submit" class="btn btn-dark w-100 py-2">Submit Secure Order</button>
             </form>

@@ -254,7 +254,8 @@ def checkout_view(request):
         order = Order.objects.create(
             customer=request.user if request.user.is_authenticated else None,
             total_amount=grand_total,
-            status='Pending'
+            status='Pending',
+            shipping_address=address
         )
         
         # NEW: Loop through the session cart and save each item permanently

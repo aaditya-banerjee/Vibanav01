@@ -78,26 +78,26 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Shipping Details</label>
-                    
+
+                    <div class="row g-2 mb-3 pb-3 border-bottom">
+                        <div class="col-md-6">
+                            <input type="text" name="receiver_name" class="form-control" required placeholder="Receiver's Full Name" value="{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="tel" name="phone_number" class="form-control" required pattern="\d{10}" placeholder="10-Digit Phone Number" value="{% if request.user.is_authenticated %}{{ request.user.customerprofile.phone_number|default:'' }}{% endif %}">
+                        </div>
+                    </div>
+
                     {% if not request.user.is_authenticated %}
                     <div class="row g-2 mb-4 pb-3 border-bottom">
                         <div class="col-12">
-                            <h6 class="fw-bold">Contact Information</h6>
+                            <input type="email" name="guest_email" class="form-control" required placeholder="Email Address (For Order Tracking & Billing)">
                         </div>
-                        <div class="col-md-6">
-                            <input type="text" name="receiver_name" class="form-control" required placeholder="Receiver's Full Name">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="email" name="guest_email" class="form-control" required placeholder="Email Address (For Order Tracking)">
-                        </div>
-                        <div class="col-md-12">
-                            <input type="tel" name="phone_number" class="form-control" required pattern="\d{10}" placeholder="10-Digit Phone Number">
-                        </div>
-                        <div class="col-12 mt-3">
+                        <div class="col-12 mt-2">
                             <div class="form-check bg-light p-3 rounded">
                                 <input class="form-check-input ms-1" type="checkbox" id="dataConsent" required>
                                 <label class="form-check-label small text-muted ms-2" for="dataConsent">
-                                    <strong>Data Consent:</strong> I agree to allow Vibana to securely store my contact and shipping details strictly for the purpose of fulfilling and delivering this order.
+                                    <strong>Data Consent:</strong> I agree to allow Vibana to securely store my contact and shipping details strictly for the purpose of fulfilling this order.
                                 </label>
                             </div>
                         </div>

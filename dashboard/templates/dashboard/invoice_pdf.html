@@ -48,19 +48,21 @@
         <tr>
             <td>
                 <div class="section-title">Billed To</div>
-                {% if order.customer and order.customer.get_full_name %}
-                    <strong>{{ order.customer.get_full_name }}</strong><br>
+                {% if order.customer %}
+                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
+                    Contact: {{ order.customer.customerprofile.phone_number|default:"Available in Profile" }}
+                {% else %}
+                    <strong>{{ order.receiver_name }}</strong><br>
+                    Contact: {{ order.receiver_phone }}
                 {% endif %}
-                <strong>Billing Address:</strong><br>
-                {{ order.shipping_address|default:"Address not provided" }}
             </td>
+            
             <td>
                 <div class="section-title">Shipped To</div>
-                {% if order.customer and order.customer.get_full_name %}
-                    <strong>{{ order.customer.get_full_name }}</strong><br>
-                {% endif %}
+                <strong>{{ order.receiver_name }}</strong><br><br>
                 <strong>Shipping Address:</strong><br>
-                {{ order.shipping_address|default:"Address not provided" }}
+                {{ order.shipping_address }}<br><br>
+                <strong>Contact:</strong> {{ order.receiver_phone }}
             </td>
         </tr>
     </table>

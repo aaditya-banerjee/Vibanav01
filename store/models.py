@@ -68,6 +68,8 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     shipping_address = models.TextField(null=True, blank=True)
     guest_email = models.EmailField(null=True, blank=True)
+    receiver_name = models.CharField(max_length=100, null=True, blank=True)
+    receiver_phone = models.CharField(max_length=20, null=True, blank=True)
     
     def __str__(self):
         customer_name = self.customer.username if self.customer else "Guest Customer"

@@ -214,18 +214,16 @@ def checkout_view(request):
 
         address = f"{street}, {city}, {state} - {pincode}"
 
-        # Handle Guest Contact Data
+        receiver_name = request.POST.get('receiver_name', '').strip()
+        phone_number = request.POST.get('phone_number', '').strip()
+
         guest_email = None
         if not request.user.is_authenticated:
             guest_email = request.POST.get('guest_email', '').strip()
-            receiver_name = request.POST.get('receiver_name', '').strip()
-            phone_number = request.POST.get('phone_number', '').strip()
             
             if not all([guest_email, receiver_name, phone_number]):
                 messages.error(request, "Guest checkout requires name, email, phone, and consent.")
                 return redirect('store:cart')
-                
-            address = f"{receiver_name} | Ph: {phone_number} | {address}"
 
         if not address:
             messages.error(request, "Please enter a valid shipping destination address.")
@@ -241,7 +239,9 @@ def checkout_view(request):
             total_amount=grand_total,
             status='Pending',
             shipping_address=address,
-            guest_email=guest_email
+            guest_email=guest_email,
+            receiver_name=receiver_name,
+            receiver_phone=phone_number
         )
         
         for product_id, quantity in cart.items():
@@ -313,7 +313,6 @@ def login_view(request):
                     return redirect('creator:portal')
                 else:
                     return redirect('store:profile')
-        # We REMOVED the global messages.error here so it only shows inside the login box!
     else:
         form = AuthenticationForm()
 

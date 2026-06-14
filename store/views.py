@@ -9,6 +9,8 @@ from .models import Product, Category, Order, Invoice, Coupon
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
+from .models import Order, CustomerProfile
+
 
 def initiate_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -277,3 +279,19 @@ def checkout_view(request):
         return render(request, 'store/order_success.html', {'order': order})
 
     return render(request, 'store/checkout.html')
+
+@login_required(login_url='/login/') # Redirects to login if a guest tries to access it
+def customer_profile_view(request):
+    """Displays the customer dashboard with order history and saved addresses."""
+    
+    # Safely get or create the profile just in case it doesn't exist yet
+    profile, created = CustomerProfile.objects.get_or_create(user=request.user)
+    
+    # Fetch all orders belonging to this user, newest first
+    user_orders = Order.objects.filter(customer=request.user).order_by('-created_at')
+    
+    context = {
+        'profile': profile,
+        'orders': user_orders,
+    }
+    return render(request, 'store/profile.html', context)

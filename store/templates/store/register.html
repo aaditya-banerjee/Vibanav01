@@ -1,0 +1,45 @@
+{% extends 'store/base_store.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Join Vibana</h2>
+                        <p class="text-muted">Create an account to track orders and save your details.</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'store:register' %}">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <div class="form-text small text-muted">{{ field.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-dark py-2">Create Account</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0 text-muted">Already have an account? <a href="{% url 'store:login' %}" class="text-dark fw-bold text-decoration-none">Log in here</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

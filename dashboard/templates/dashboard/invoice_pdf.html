@@ -48,22 +48,18 @@
         <tr>
             <td>
                 <div class="section-title">Billed To</div>
-                {% if order.customer %}
-                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                {% else %}
-                    <strong>Guest Customer</strong><br>
+                {% if order.customer and order.customer.get_full_name %}
+                    <strong>{{ order.customer.get_full_name }}</strong><br>
                 {% endif %}
-                <br><strong>Billing Address:</strong><br>
+                <strong>Billing Address:</strong><br>
                 {{ order.shipping_address|default:"Address not provided" }}
             </td>
             <td>
                 <div class="section-title">Shipped To</div>
-                {% if order.customer %}
-                    <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                {% else %}
-                    <strong>Guest Customer</strong><br>
+                {% if order.customer and order.customer.get_full_name %}
+                    <strong>{{ order.customer.get_full_name }}</strong><br>
                 {% endif %}
-                <br><strong>Shipping Address:</strong><br>
+                <strong>Shipping Address:</strong><br>
                 {{ order.shipping_address|default:"Address not provided" }}
             </td>
         </tr>
@@ -121,7 +117,7 @@
         <strong>Terms & Conditions:</strong><br>
         1. This is a computer-generated document and does not require a physical signature.<br>
         2. Goods once sold are subject to the standard Vibana return policy.<br>
-        3. Freedo acts solely as a facilitator. (Just kidding, Vibana handles everything!)<br><br>
+        3. All disputes are subject to standard local jurisdiction.<br><br>
         <em>Thank you for shopping with Vibana Apparel.</em>
     </div>
 

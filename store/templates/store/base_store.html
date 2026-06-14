@@ -29,16 +29,22 @@
                 <div class="d-flex align-items-center gap-3">
                     {% if request.user.is_authenticated %}
                         
-                        {% if request.user.is_superuser or request.user.is_staff %}
+                        {% if request.user.is_superuser %}
                             <a href="{% url 'admin:index' %}" class="text-warning text-decoration-none fw-bold small">Admin Portal</a>
-                        {% else %}
-                            <a href="{% url 'creator:portal' %}" class="text-light text-decoration-none hover-white small">Creator Workspace</a>
+                        {% endif %}
+
+                        {% if request.user.is_staff and not request.user.is_superuser %}
+                            <a href="{% url 'creator:portal' %}" class="text-info text-decoration-none fw-bold small">🎨 Creator Workspace</a>
                         {% endif %}
                         
-                        <a href="{% url 'creator:logout' %}" class="text-light text-decoration-none hover-white small">Logout</a>
+                        <a href="{% url 'store:profile' %}" class="text-light text-decoration-none hover-white small">My Account</a>
+                        <a href="{% url 'store:logout' %}" class="text-danger text-decoration-none hover-white small fw-bold">Log Out</a>
                         
                     {% else %}
-                        <a href="{% url 'creator:login' %}" class="text-light text-decoration-none hover-white small">Login / Pitch Art</a>
+                        
+                        <a href="{% url 'store:login' %}" class="text-light text-decoration-none hover-white small">Log In</a>
+                        <a href="{% url 'store:register' %}" class="btn btn-light text-dark btn-sm fw-bold px-3 rounded-pill">Sign Up</a>
+                        
                     {% endif %}
                 </div>
 

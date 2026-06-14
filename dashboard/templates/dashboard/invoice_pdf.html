@@ -50,7 +50,6 @@
                 <div class="section-title">Billed To</div>
                 {% if order.customer %}
                     <strong>{{ order.customer.get_full_name|default:order.customer.username }}</strong><br>
-                    Email: {{ order.customer.email|default:"N/A" }}<br>
                 {% else %}
                     <strong>Guest Customer</strong><br>
                 {% endif %}
